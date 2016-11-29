@@ -12,6 +12,7 @@ This is in progress and being developed.   If you want a more stable one, go to 
 1. Store the ev3 files uploaded so that they are backed up as well as the changesets
 2. Change the logins so it doesn't store passwords as plain text.  (this will include an admin page where people can create new accounts)   
 3. Cleanup some of the formatting on the web pages
+4. Move to using cherrypy and get rid of having own web framework
 
 #Issues 
 Issues?  Please open them on the github project at https://github.com/alan412/ev3hub 
