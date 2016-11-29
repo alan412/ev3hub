@@ -1,2 +1,4 @@
 # keep compiled python out of repo
 *.pyc
+Projects/*
+Commits/*
