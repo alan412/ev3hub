@@ -363,6 +363,8 @@ class download_project:
 class create_project:
   def POST(self):
     i = web.input(ev3file={},public=False,description='',name='',by='')
+    if not os.path.exists('Commits'):
+      os.mkdir('Commits')
     if not os.path.exists('Projects/'+web.ctx.username):
       os.mkdir('Projects/'+web.ctx.username)
     if os.path.exists('Projects/'+web.ctx.username+'/'+i.name) :
