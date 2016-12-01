@@ -4,6 +4,7 @@ import cStringIO
 import hashlib
 import os
 import time
+import xml.etree.ElementTree as ET
 
 # commits json
 '''
@@ -140,17 +141,26 @@ class EV3Project(object):
         
     def uploadCommit(self, ev3data, comment, who, host):
         files = [];
-        parent = 0;
+        parent = "";
 
         in_memory_zip = cStringIO.StringIO(ev3data)
         with zipfile.ZipFile(in_memory_zip, "r", zipfile.ZIP_DEFLATED, False) as zf:
             for fileName in zf.namelist():
-                if fileName == "parent.id":
-                    pass
-                    # code for putting in parent goes here
-                elif fileName == "Project.lvpojx":
-                    pass
-                    # code for reading variables goes here
+                if fileName == "ev3hub.json":
+                    with zf.open("ev3hub.json", 'r') as json_file:
+                        data = json.loads(json_file.read())
+                        parent = data["parent"]
+                elif fileName == "Project.lvprojx":
+                    with zf.open('Project.lvprojx', 'r') as project_file:
+                      new_projxml = ET.fromstring(project_file.read())
+                    for ns in new_projxml:
+                      if ns.attrib['Name'] == 'Default':
+                        for sns in ns[0]:
+                          if 'ProjectSettings' in sns.tag:
+                            for ssns in sns:
+                              if 'NamedGlobalData' in ssns.tag:
+                                for var in ssns:
+                                  files.append(['VAR.'+ var.attrib['Type'] + '.' + var.attrib['Name'],""])
                 else:  
                     contents = zf.read(fileName)
                     m = hashlib.sha1()
@@ -166,7 +176,7 @@ class EV3Project(object):
             json.dump(commit, outfile, indent=4, sort_keys=True, separators=(',', ':'))        
         
 if __name__ == "__main__":
-    with open("test.ev3", 'r') as ev3File:
+    with open("test_large.ev3", 'r') as ev3File:
         ev3contents = ev3File.read()
     ev3P = EV3Project("test")
     ev3P.uploadCommit(ev3contents, "Initial Commit", "author", "honeycrisp")
