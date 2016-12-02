@@ -1,3 +1,4 @@
+import web
 import json
 import zipfile
 import cStringIO
@@ -79,14 +80,19 @@ import hashlib
     }
 }
 '''
+render = web.template.render('HTMLTemplates/', base = '', globals={
+  'web': web
+})
 
-class commit(object):
+class Commit(object):
     def __init__(self, id, commitDetails):
       self.id = id;
       self.commitDetails = commitDetails;
       
     def files(self):
       return self.commitDetails["files"];  
+    def id(self):
+      return self.id;
     def __str__(self):
       return "{0}:{1}".format(self.id, self.commitDetails)
         
@@ -138,6 +144,25 @@ class EV3Project(object):
         while(os.path.isfile("{0}.json".format(id))):
            id = id + 1;
         return id;  
+
+    def getEV3Data(self, commit):
+        variables = [];
+        ev3Contents = cStringIO.StringIO()
+        with zipfile.ZipFile(ev3Contents, "a", zipfile.ZIP_DEFLATED, False) as zf:
+# don't forget to add ev3hub.json file with which commit it is!            
+            for filename in commit.files():
+                if filename[1] == "":
+                    variables.append(filename[0]);
+                else:
+                    with open("repo/" + filename[1], 'r') as file:
+                        zf.writestr(filename[0], file.read())    
+            # generate lvprojx.proj file here
+            # zf.writestr('Project.lvprojx', str(render.lvprojx(programs, myblockdefs, variables, medias, False)))
+    
+            for zfile in zf.filelist:
+                zfile.create_system = 0
+            zf.close()
+        return ev3Contents.getvalue();
         
     def uploadCommit(self, ev3data, comment, who, host):
         files = [];
@@ -167,8 +192,9 @@ class EV3Project(object):
                     m.update(contents)
                     files.append([fileName, m.hexdigest()])
                     if not os.path.isfile("repo/"+m.hexdigest()):
-                        zf.extract(fileName, "repo/")
-                        os.rename("repo/"+fileName,"repo/"+m.hexdigest())
+                        data = zf.read(fileName)
+                        with open("repo/"+m.hexdigest()), "wb" as outfile:
+                            outfile.write(data)
         commit = {"parent" : parent, "time" : time.time(), "name" : who, "host" : host, "comment" : comment, "files" : files}
         
         id = self.findNextCommit();
@@ -180,12 +206,17 @@ if __name__ == "__main__":
         ev3contents = ev3File.read()
     ev3P = EV3Project("test")
     ev3P.uploadCommit(ev3contents, "Initial Commit", "author", "honeycrisp")
+    with open("1.json", "r") as infile:
+        commit = Commit("1", json.loads(infile.read()))
+        with open("out.zip", "w") as outfile:
+           outfile.write(ev3P.getEV3Data(commit))
+        
         
 '''    
     with open('testData.json', 'r') as testDataFile:
         testData = json.loads(testDataFile.read())
-        oldCommit = commit("1", testData["commits"]["1"]);
-        newCommit = commit("2", testData["commits"]["2"]);
+        oldCommit = Commit("1", testData["commits"]["1"]);
+        newCommit = Commit("2", testData["commits"]["2"]);
         
         cs = changeset(oldCommit, newCommit);        
         print cs;
