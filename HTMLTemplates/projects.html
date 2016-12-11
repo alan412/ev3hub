@@ -1,0 +1,27 @@
+<%inherit file="base.html"/>
+<H3 align=right>Logged in as ${username}. <A HREF="logout">logout</A></H3>
+
+% if projects:
+<TABLE width="50%" border="1">
+<TR><TD>Select Project</TD></TR>
+	% for project in projects:
+		<TR class=${loop.cycle('even', 'odd')}><TD><A HREF="projects/${project}">${project}</A></TD></TR>
+	% endfor
+</TABLE>
+% else:
+<H1>No current projects</H1>
+% endif
+
+<br/>
+<form method="post" action="newProject" enctype="multipart/form-data">
+<H1>New Project</H1>
+<br/>
+<table>
+<tr/>
+<tr><td>Project Name:</td><td><input type="text" value="" name="project"/></td></tr>
+<tr><td>Programmer:</td><td><input type="text" value="${programmer}" name="who"/></td></tr>
+<tr><td>Host Computer:</td><td><input type="text" value="${host}" name="host"/></td></tr>
+<tr><td><input type="file" name="ev3file"/></td></tr>
+<tr><td><input type="submit" value="Create"/></td></tr>
+</table>
+</form>

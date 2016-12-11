@@ -1,0 +1,18 @@
+<%inherit file="base.html"/>
+<H3 align=right>Logged in as ${username}. <A HREF="logout">logout</A></H3>
+<TABLE align="center">
+<TD><H1 align=right><A HREF="projects">Project: ${project}</A></H1></TD>
+</TABLE>
+
+<TABLE width="100%">
+<TR><TD align="center"><H1><A HREF="download?cid=head">Download</A></H1></TD>
+<TD align="center"><H1><A HREF="upload">Upload (Commit)</A></H1></TD>
+</TR>
+</TABLE>
+
+<TABLE width="100%" border="1">
+<TR><TD>id</TD><TD>Time</TD><TD>Comments</TD><TD>Who</TD><TD>Host</TD></TR>
+	% for commit in commits:
+		<TR class={loop.cycle('even', 'odd')}><TD>${commit.cid()}</TD><TD>${commit.timeStr()}</TD><TD>${commit.comment()}</TD><TD>${commit.name()}</TD><TD>${commit.host()}</TD></TR>
+	% endfor
+</TABLE>	

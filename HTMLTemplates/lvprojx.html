@@ -1,4 +1,3 @@
-$def with (programs, myblockdefs, vars, medias, daisychain)
 <?xml version="1.0" encoding="utf-8"?>
 <SourceFile Version="1.0.2.10" xmlns="http://www.ni.com/SourceModel.xsd">
 	<Namespace Name="Default">
@@ -21,31 +20,37 @@ $def with (programs, myblockdefs, vars, medias, daisychain)
 
                 <DefinitionReference DocumentTypeIdentifier="NationalInstruments.X3.App.X3FolderLoaderDefinition" Name="vi\.lib_PBR" Bindings="Envoy,DefinitionReference,EmbeddedReference" />
 
-				$for program in programs:
-					<SourceFileReference StoragePath="$program" RelativeStoragePath="$program" OverridingDocumentTypeIdentifier="X3VIDocument" DocumentTypeIdentifier="NationalInstruments.LabVIEW.VI.Modeling.VirtualInstrument" Name="${program.replace('.','\\.').replace(' ','\\ ')}">
+				% for program in programs:
+					<SourceFileReference StoragePath="$program" RelativeStoragePath="${program}" OverridingDocumentTypeIdentifier="X3VIDocument" DocumentTypeIdentifier="NationalInstruments.LabVIEW.VI.Modeling.VirtualInstrument" Name="${program.replace('.','\\.').replace(' ','\\ ')}">
 						<X3DocumentSettings ShowFileOnStartup="False" IsTeacherOnlyFile="False" IsHiddenDependency="False" xmlns="http://www.ni.com/X3DocumentSettings.xsd" />
 					</SourceFileReference>
-				$for myblock in myblockdefs:
+				% endfor
+				% for myblock in myblockdefs:
 					<SourceFileReference StoragePath="$myblock" RelativeStoragePath="$myblock" OverridingDocumentTypeIdentifier="X3VIDocument" DocumentTypeIdentifier="NationalInstruments.LabVIEW.VI.Modeling.VirtualInstrument" Name="${myblock.replace('.','\\.').replace(' ','\\ ')}" Bindings="Envoy,DefinitionReference,SourceFileReference,X3VIDocument" >
 						<X3DocumentSettings ShowFileOnStartup="False" IsTeacherOnlyFile="False" IsHiddenDependency="False" xmlns="http://www.ni.com/X3DocumentSettings.xsd" />
 					</SourceFileReference>
 					<DefinitionReference DocumentTypeIdentifier="NationalInstruments.ExternalFileSupport.Modeling.ExternalFileType" Name="${myblock.replace('.','\\.').replace(' ','\\ ')}\.mbxml" Bindings="Envoy,DefinitionReference,EmbeddedReference,ProjectItemDragDropDefaultService" />
-				$for media in medias:
+				% endfor
+				% for media in medias:
 					<DefinitionReference DocumentTypeIdentifier="NationalInstruments.ExternalFileSupport.Modeling.ExternalFileType" Name="${media.replace('.','\\.').replace(' ','\\ ')}" Bindings="Envoy,DefinitionReference,EmbeddedReference,ProjectItemDragDropDefaultService" />
+				% endfor
 			</Target>
 			<ProjectSettings>
-				$if vars:
+				% if vars:
 					<NamedGlobalData xmlns="http://www.ni.com/X3NamedGlobalData.xsd">
-					$for v in vars:
+					% for v in vars:
 						<Datum Name="$v" Kind="Variable" Type="$vars[v]" />
+					% endfor
 					</NamedGlobalData>
-				$else:
+				% else:
 					<NamedGlobalData xmlns="http://www.ni.com/X3NamedGlobalData.xsd" />
+				% endif
 				<ProjectOrigin Path="en-US/Internal/FreePlayProgram.ev3" xmlns="http://www.ni.com/X3ProjectOrigin.xsd" />
-				$if daisychain:
+				% if daisychain:
 					<DaisyChainMode On="True" xmlns="http://www.ni.com/X3ProjectPropertiesModel.xsd" />
-				$else:
+				% else:
 					<DaisyChainMode On="False" xmlns="http://www.ni.com/X3ProjectPropertiesModel.xsd" />
+				% endif
 			</ProjectSettings>
 		</Project>
 	</Namespace>
@@ -84,18 +89,20 @@ $def with (programs, myblockdefs, vars, medias, daisychain)
             <Location />
         </LoaderDefinition>
     </Namespace>
-	$for myblock in myblockdefs:
+	% for myblock in myblockdefs:
 		<Namespace Name="${myblock.replace('.','\\.').replace(' ','\\ ')}\.mbxml">
 			<ExternalFile xmlns="http://www.ni.com/ExternalFile.xsd">
 				<RelativeStoragePath>${myblock}.mbxml</RelativeStoragePath>
 				<StoragePath></StoragePath>
 			</ExternalFile>
 		</Namespace>
-	$for media in medias:
+	% endfor
+	% for media in medias:
 		<Namespace Name="${media.replace('.','\\.').replace(' ','\\ ')}">
 	        <ExternalFile xmlns="http://www.ni.com/ExternalFile.xsd">
 	            <RelativeStoragePath>$media</RelativeStoragePath>
 	            <StoragePath />
 	        </ExternalFile>
 	    </Namespace>
+	% endfor
 </SourceFile>

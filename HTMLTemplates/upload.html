@@ -1,0 +1,16 @@
+<%inherit file="base.html"/>
+<H1 align="center">${project}</H1>
+<form method="post" action="uploadDone" enctype="multipart/form-data">
+<input type="hidden" name="project" value="${project}"/>
+<H1>Upload (Commit)</H1>
+	Please enter in all fields.   
+<br/>
+<table>
+<tr/>
+<tr><td>Comment:</td><td><input type="text" name="comment" size="60"/></td></tr>
+<tr><td>Programmer:</td><td><input type="text" value="${programmer}" name="who"/></td></tr>
+<tr><td>Host Computer:</td><td><input type="text" value="${host}" name="host"/></td></tr>
+<tr><td><input type="file" name="ev3file"/></td></tr>
+<tr><td><input type="submit" value="Upload"/></td></tr>
+</table>
+</form>

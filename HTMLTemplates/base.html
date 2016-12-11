@@ -1,0 +1,12 @@
+## base.html
+<html>
+	<head>
+		<link rel="stylesheet" type="text/css" href="static/style.css"/>
+	</head>
+    <body>
+% if error is not UNDEFINED:
+	    <H1>${error}</H1>
+% endif		
+        ${self.body()}
+    </body>
+</html>

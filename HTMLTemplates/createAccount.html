@@ -1,0 +1,14 @@
+<%inherit file="base.html"/>
+<H1>${error}</H1>
+<h3>Create Account</h3>
+  Your email will only be used if you forget your password to send you a reset link
+  <form method="post" action="createUser">
+    Login:<input type="text" name="username" placeholder="Login Name"/>
+	<br/>
+	Email:<input type="text" name="email" placeholder="email"/>
+	<br/>
+    <br/>Password:<input type="password" name="password"  placeholder="password" />
+    <br/>Repeat:<input type="password" name="password2"  placeholder="password" />
+    <br/><input type="submit" value="Create"/>
+  </form>
+  </center>

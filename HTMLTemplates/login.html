@@ -1,67 +1,16 @@
-$def with()
-<link rel="icon" 
-      type="image/ico" 
-      href="/static/favicon.ico">
-<style>
-* {
-  font-size: inherit;
-  font-family: Segoe UI, Roboto, Droid Sans, Verdana, Tahoma, Serif;
-  padding: 0px;
-  margin: 0px;
-  border: none;
-}
-
-a{
-  color: rgb(5,146,251);
-  text-decoration: none;
-}
-a:hover{
-  text-decoration: underline;
-}
-#topStatusBar {
-  background-color: rgb(240,240,240);
-  padding: 8px;
-  font-size: 20px;
-}
-table thead {
-  background-color: rgb(240,200,35);
-  font-size: 20px;
-}
-table thead td {
-  padding: 4px;
-}
-table td, table td * {
-  vertical-align: top;
-}
-
-.selectedGreen {
-  background: rgba(100,228,14,0.5)
-}
-
-
-ol {
-  list-style: none;
-  padding-left: 1px;
-  
-}
-ol li{
-  padding: 8px;
-  margin: 5px;
-}
-</style>
-
+<%inherit file="base.html"/>
 <br/>
 <table width="100%">
   <tr><td width="35%"><center>
   <img src='/static/splash.svg' width="450px">
   </center></td><td><center>
 <h3>Login to EV3HUB</h3>
-  <form method="post" action="/login">
-    
+  <form method="post" action="login">   
     <input type="text" name="username" placeholder="Login Name" style="border:1px solid #333333; padding: 2px; margin:4px;"/>
     <br/><input type="password" name="password"  placeholder="password" style="border:1px solid #333333; padding: 2px; margin:4px;"/>
-    <br/><input type="submit" value="Login" action="/login"/>
+    <br/><input type="submit" value="Login" action="login"/>
   </form>
-  <br/><br/><a href="/about">About</a>
+  <br/><br/><a href="createAccount">Create New Account</a>
+  <br/>Later there will be functionality if you forgot your password, but it isn't implemented yet.  Sorry.
   </center>
   </td></tr></table>
