@@ -1,6 +1,5 @@
 import cherrypy
 import os
-import web.template
 import ev3project
 import json
 from mako.template import Template
@@ -11,23 +10,25 @@ from passlib.apps import custom_app_context as pwd_context
 class Cookie(object):
     def __init__(self, name):
         self.name = name;
-    def get(self, default):
+    def get(self, default=''):
         result = default
         try:
            result = cherrypy.request.cookie[self.name].value;
         except:
-           cherrypy.response.cookie[self.name] = default;
+           self.set(default);
         return result;
     def set(self, value, expires=3600*24*365):
         cherrypy.response.cookie[self.name] = value
         cherrypy.response.cookie[self.name]['expires'] = expires  
-                
+        cherrypy.request.cookie[self.name] = value;   # Not sure this is kosher, this is in case it is checked before a roundtrip
     def delete(self):
         self.set('', 0)  # Way to delete a cookie is to set it with an expiration time of immediate
 
 class Users(object):
     def __init__(self):
         self.users = {};
+        if not os.path.exists('data'):
+            os.makedirs('data')
         self.path = os.path.join('data','users.json')
         try:
             with open(self.path, 'r') as user_file:
@@ -40,6 +41,7 @@ class Users(object):
         self.users[username] = {}
         self.users[username]['password'] = pwd_context.hash(password)
         self.users[username]['email'] = email;
+
         with open(self.path, 'w') as user_file:
                json.dump(self.users, user_file)
 
@@ -47,16 +49,12 @@ class Users(object):
         try:
             result = self.users[username];
         except:
-            result = ''
-            
+            result = ''        
         return result;        
     def verifyPassword(self, username,password):
         if self.get(username) == '':
-            print 'No match'
-            print self.users
             return False;
         else:
-            print self.users[username]
             return pwd_context.verify(password, self.users[username]['password'])
 
 
@@ -89,11 +87,13 @@ class EV3hub(object):
     
     def get_projectlist(self, username):
         path = os.path.join('data', username);
-        return next(os.walk(path))[1]
+        if os.path.exists(path):
+           return next(os.walk(path))[1]
+        return [];
         
     @cherrypy.expose
     def index(self):
-        username = Cookie('username').get("")
+        username = Cookie('username').get()
         if not username:
             return self.show_loginpage('')
         return self.show_mainpage(username)
@@ -101,21 +101,29 @@ class EV3hub(object):
     @cherrypy.expose
     def projects(self):
         host = Cookie('host').get(cherrypy.request.headers['Remote-Addr']);
-        username = Cookie('username').get('')
-        programmer = Cookie('who').get('')
+        username = Cookie('username').get()
+        programmer = Cookie('who').get()
         if not username:
+           print "No username"
            return self.show_loginpage('')       
          
         return self.template("projects.html",projects=self.get_projectlist(username),host=host,username=username,programmer=programmer)
-    
+    @cherrypy.expose
+    def changeProject(self, project):
+        username = Cookie('username').get()
+        if not username:
+            return self.show_loginpage('')
+        Cookie('project').set(project)
+        return self.show_mainpage(username)
+                
     @cherrypy.expose
     def newProject(self, project, who, host, ev3file):
-        username = Cookie('username').get('')
+        username = Cookie('username').get()
         if not username:
            return self.show_loginpage('')       
         if project in self.get_projectlist(username):
            host = Cookie('host').get(cherrypy.request.headers['Remote-Addr']);
-           programmer = Cookie('who').get('')            
+           programmer = Cookie('who').get()            
            return self.template("projects.html",projects=self.get_projectlist(username),host=host,username=username,programmer=programmer, error="Duplicate Project")
               
         ev3data = ev3file.file.read();
@@ -123,11 +131,12 @@ class EV3hub(object):
         
         ev3P = ev3project.EV3Project.newProject(username, project, ev3data, who, host)
 
-        return self.show_mainpage('username')    
+        return self.show_mainpage(username)    
     @cherrypy.expose
     def login(self,username=None,password=None):
         if self.users.verifyPassword(username, password):
             Cookie('username').set(username)
+            print "Logged in as {0}".format(username)
             return self.show_mainpage(username);
         else:
             return self.show_loginpage("Username and password don't match")
@@ -154,6 +163,7 @@ class EV3hub(object):
     def logout(self):
         Cookie('username').delete()
         Cookie('project').delete()
+        Cookie('who').delete()
          
         return self.show_loginpage('')
     
@@ -166,13 +176,27 @@ class EV3hub(object):
 
         if project and username:
            return self.show_uploadpage(project, username, programmer, host);
+        else: 
+           return self.projects()    
+    @cherrypy.expose
+    def download(self, cid):
+        project = Cookie('project').get('')
+        ev3P = ev3project.EV3Project(project, Cookie('username').get(''))
+
+        if cid == 'head':
+          filename = project + ".ev3"
         else:
-           return self.show_loginpage('')    
-        
+          filename = "{0}-{1}.ev3".format(project, cid)
+          
+        cherrypy.response.headers['Content-Type'] = 'application/x-download'    
+        cherrypy.response.headers['Content-Disposition'] = 'attachment; filename="{0}"'.format(filename)
+        print cherrypy.response.headers
+        return ev3P.download(cid)
+            
     @cherrypy.expose
     def uploadDone(self, project, comment, who, host, ev3file):   
         ev3data = ev3file.file.read();
-        ev3P = ev3project.EV3Project(Cookie('project').get(project))
+        ev3P = ev3project.EV3Project(Cookie('project').get(project), Cookie('username').get(''))
         Cookie('host').set(host)
         Cookie('who').set(who)
         
@@ -184,12 +208,7 @@ class EV3hub(object):
         username = Cookie('username').get('')
         return self.mainpage('username')
 
-'''
-        Eventually:
-        
-        /project/<name>
-        /projects - for listing (and new project) 
-'''
+
                
 if __name__ == '__main__':
    # This is the configuration and starting of the service

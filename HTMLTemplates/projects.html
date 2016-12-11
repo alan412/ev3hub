@@ -5,7 +5,7 @@
 <TABLE width="50%" border="1">
 <TR><TD>Select Project</TD></TR>
 	% for project in projects:
-		<TR class=${loop.cycle('even', 'odd')}><TD><A HREF="projects/${project}">${project}</A></TD></TR>
+		<TR class=${loop.cycle('even', 'odd')}><TD><A HREF="changeProject?project=${project}">${project}</A></TD></TR>
 	% endfor
 </TABLE>
 % else:

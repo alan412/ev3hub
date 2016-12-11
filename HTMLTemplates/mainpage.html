@@ -11,8 +11,8 @@
 </TABLE>
 
 <TABLE width="100%" border="1">
-<TR><TD>id</TD><TD>Time</TD><TD>Comments</TD><TD>Who</TD><TD>Host</TD></TR>
+<TR><TD>id</TD><TD>Comments</TD><TD>Time</TD><TD>Who</TD><TD>Host</TD></TR>
 	% for commit in commits:
-		<TR class={loop.cycle('even', 'odd')}><TD>${commit.cid()}</TD><TD>${commit.timeStr()}</TD><TD>${commit.comment()}</TD><TD>${commit.name()}</TD><TD>${commit.host()}</TD></TR>
+		<TR class={loop.cycle('even', 'odd')}> <TD><A HREF="download?cid=${commit.cid()}">${commit.cid()}</TD></A> <TD>${commit.comment()}</TD> <TD>${commit.timeStr()}</TD> <TD>${commit.name()}</TD> <TD>${commit.host()}</TD> </TR>
 	% endfor
 </TABLE>	

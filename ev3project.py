@@ -12,10 +12,11 @@ from operator import methodcaller
 
 class Commit(object):
     def __init__(self, commit_id, commitDetails):
-      self.id = commit_id;
+      self.commit_id = commit_id;
       self.commitDetails = commitDetails;
     def cid(self):
-      return self.id;
+      print "returning cid:{0}".format(self.commit_id)
+      return self.commit_id;
     def files(self):
       return self.commitDetails["files"];  
     def remove_file(self, filename):
@@ -37,13 +38,15 @@ class Commit(object):
       return self.commitDetails["comment"];
        
     def __str__(self):
-      return "{0}:{1}".format(self.id, self.commitDetails)
+      return "{0}:{1}".format(self.commit_id, self.commitDetails)
     @classmethod
     def from_file(cls, cid, file):
       return cls(cid, json.loads(file.read()))  
+    
     @classmethod
     def from_id(cls, cid, path):
-      return cls.from_file(id, open(cls.file_from_id(path, cid), "r"))
+      return cls.from_file(cid, open(cls.file_from_id(path, cid), "r"))
+      
     @classmethod
     def file_from_id(cls, path, cid):
       return os.path.join(path, "{0}.json".format(cid));
@@ -90,7 +93,7 @@ class EV3Project(object):
         data = {}
         data["head"] = 1;
         newP.uploadCommit(ev3data, "Initial Commit", who, host);    
-        with open("project.json", "w") as project_file:
+        with open(self.fullpath("project.json"), "w") as project_file:
             json.dump(data, project_file);      
         return newP
      
@@ -118,7 +121,8 @@ class EV3Project(object):
         cid = 1;
 
         while(os.path.isfile(Commit.file_from_id(self.path, cid))):
-            commits.append(Commit.from_id(cid))
+            print "{0}{1}".format(self.path, cid)
+            commits.append(Commit.from_id(cid, self.path))
             cid = cid + 1
         return sorted(commits, key=methodcaller('time'), reverse=True)                
                
@@ -127,7 +131,13 @@ class EV3Project(object):
         while(os.path.isfile(Commit.file_from_id(self.path, cid))):
            cid = cid + 1;
         return str(cid);  
-
+    
+    def download(self, cid):
+        if cid == "head":
+            return self.getEV3Data(Commit.from_id(self.head, self.path))
+        else:
+            return self.getEV3Data(Commit.from_id(cid, self.path))
+            
     def getEV3Data(self, commit):
         variables = {}
         programs = []
@@ -243,6 +253,7 @@ class EV3Project(object):
             id_commit = Commit.from_id(cid, self.path)
             # find common parent
             parent_cid = self.find_common_parent(head_commit, id_commit)
+            print "Parent:{0}->{1}->{2}".format(parent_cid, head_commit, id_commit)
             if (parent_cid == "") or (self.head == parent_cid):   # if you are uploading projects not using ev3hub treat as if you are directly after head
                 data["head"] = cid;   
             else:
@@ -292,8 +303,8 @@ if __name__ == "__main__":
     with open(commit_filename, 'r') as ev3File:
         ev3contents = ev3File.read()
     ev3P = EV3Project("test", "user")
-    id = ev3P.uploadCommit(ev3contents, args.comment, "author", "honeycrisp")
-    merge_errors = ev3P.merge(id)
+    cid = ev3P.uploadCommit(ev3contents, args.comment, "author", "honeycrisp")
+    merge_errors = ev3P.merge(cid)
     if merge_errors:
        print merge_errors
     else:
