@@ -12,7 +12,7 @@ If you are uncomfortable setting up python libraries to run and running your own
 
 #Known Issues 
 A few known problems:
-1) If you press "upload" without giving a file, than kablooie...   (In fact, I don't do verification much of anywhere)
+1) Very little verification and worthless errors
 2) If you forget your password, then you are up the creek without a paddle.   I haven't put in the "forgot password" yet. 
 3) Right now, items are put into cookies, but not in any kind of secure way
 4) the UI is ugly and is as bare bones as I could justify for testing

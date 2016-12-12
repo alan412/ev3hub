@@ -4,3 +4,9 @@
   padding: 0px;
   margin: 0px;
 }
+
+h1.error{
+	text-align: center;
+	background-color: #880000;
+	color: white;
+}

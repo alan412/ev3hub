@@ -65,19 +65,19 @@ class EV3hub(object):
     def template(self, name, **kwargs):
         return self.lookup.get_template(name).render(**kwargs);
           
-    def show_loginpage(self, error):      
+    def show_loginpage(self, error=''):      
         return self.template("login.html", error = error)
     
-    def show_mainpage(self, username):
+    def show_mainpage(self, username, error=''):
         project = Cookie('project').get("")
         if not project:
             return self.projects()
         ev3P = ev3project.EV3Project(project, username)
         commits = ev3P.getListOfCommits()
         
-        return self.template("mainpage.html", username = username, project = project, commits = commits)
+        return self.template("mainpage.html", username = username, project = project, commits = commits, error=error)
         
-    def show_createaccountpage(self, error):
+    def show_createaccountpage(self, error=''):
         return self.template("createAccount.html", error = error)
     
     def show_uploadpage(self, project, username, programmer, host):
@@ -192,20 +192,22 @@ class EV3hub(object):
         return ev3P.download(cid)
             
     @cherrypy.expose
-    def uploadDone(self, project, comment, who, host, ev3file):   
-        ev3data = ev3file.file.read();
-        ev3P = ev3project.EV3Project(Cookie('project').get(project), Cookie('username').get(''))
-        Cookie('host').set(host)
-        Cookie('who').set(who)
-        
-        cid = ev3P.uploadCommit(ev3data, comment, who, host)
-        merge_errors = ev3P.merge(cid)
-        if merge_errors:
-# TODO: do this for real            
-           return merge_errors             
+    def uploadDone(self, project, comment, who, host, ev3file):  
+        error = '' 
+        try:
+           Cookie('host').set(host)
+           Cookie('who').set(who)
+           ev3data = ev3file.file.read();
+           ev3P = ev3project.EV3Project(Cookie('project').get(project), Cookie('username').get(''))
+           cid = ev3P.uploadCommit(ev3data, comment, who, host)
+           merge_errors = ev3P.merge(cid)
+           if merge_errors:
+              error = merge_errors            
+        except:
+            error = 'Error in uploading.  Upload not saved'
+         
         username = Cookie('username').get('')
-        return self.show_mainpage(username)
-        
+        return self.show_mainpage(username, error)
                
 if __name__ == '__main__':
    # This is the configuration and starting of the service
