@@ -5,7 +5,7 @@
 <TD><H1 align=right><A HREF="projects">Project: ${project}</A></H1></TD>
 </TABLE>
 
-<TABLE width="100%">
+<TABLE class=spacing width="100%">
 <TR><TD align="center"><H1><A HREF="download?cid=head">Download</A></H1></TD>
 <TD align="center"><H1><A HREF="upload">Upload (Commit)</A></H1></TD>
 </TR>
@@ -13,12 +13,17 @@
 
 <FORM method="post" action="diff">
 	<input type="submit" value="Diff - Disabled for now" disabled/>
-<TABLE width="100%" border="1">
-<TR><TD>1</TD><TD>2</TD><TD>id</TD><TD>parent</TD><TD>Comments</TD><TD>Time</TD><TD>Who</TD><TD>Host</TD></TR>
+<TABLE class="commits" width="100%" border="1">
+<TR><TH>1</TH><TH>2</TH><TH>id</TH><TH>parent</TH><TH>Comments</TH><TH>Time</TH><TH>Who</TH><TH>Host</TH></TR>
 	% for commit in commits:
-		<TR class={loop.cycle('even', 'odd')}> <TD><input type="radio" name="diff1" value="${commit.cid()}"></TD> 
-			<TD><input type="radio" name="diff2" value="${commit.cid()}"></TD> 
-			<TD><A HREF="download?cid=${commit.cid()}">${commit.cid()}</TD></A> <TD>${commit.parent()}</TD><TD>${commit.comment()}</TD> <TD>${commit.timeStr()}</TD> <TD>${commit.name()}</TD> <TD>${commit.host()}</TD> </TR>
+		<TR class={loop.cycle('even', 'odd')}> <TD class="commits"><input type="radio" name="diff1" value="${commit.cid()}"></TD> 
+			<TD class="commits"><input type="radio" name="diff2" value="${commit.cid()}"></TD> 
+			<TD class="commits"><A HREF="download?cid=${commit.cid()}">${commit.cid()}</TD></A> 
+			<TD class="commits">${commit.parent()}</TD>
+			<TD class="commits">${commit.comment()}</TD> 
+			<TD class="commits">${commit.timeStr()}</TD> 
+			<TD class="commits">${commit.name()}</TD> 
+			<TD class="commits">${commit.host()}</TD> </TR>
 	% endfor
 </TABLE>	
 </FORM>
