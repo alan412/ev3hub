@@ -21,7 +21,7 @@
                 <DefinitionReference DocumentTypeIdentifier="NationalInstruments.X3.App.X3FolderLoaderDefinition" Name="vi\.lib_PBR" Bindings="Envoy,DefinitionReference,EmbeddedReference" />
 
 				% for program in programs:
-					<SourceFileReference StoragePath="$program" RelativeStoragePath="${program}" OverridingDocumentTypeIdentifier="X3VIDocument" DocumentTypeIdentifier="NationalInstruments.LabVIEW.VI.Modeling.VirtualInstrument" Name="${program.replace('.','\\.').replace(' ','\\ ')}">
+					<SourceFileReference StoragePath="${program}" RelativeStoragePath="${program}" OverridingDocumentTypeIdentifier="X3VIDocument" DocumentTypeIdentifier="NationalInstruments.LabVIEW.VI.Modeling.VirtualInstrument" Name="${program.replace('.','\\.').replace(' ','\\ ')}">
 						<X3DocumentSettings ShowFileOnStartup="False" IsTeacherOnlyFile="False" IsHiddenDependency="False" xmlns="http://www.ni.com/X3DocumentSettings.xsd" />
 					</SourceFileReference>
 				% endfor

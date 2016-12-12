@@ -15,15 +15,21 @@ class Commit(object):
       self.commit_id = commit_id;
       self.commitDetails = commitDetails;
     def cid(self):
-      print "returning cid:{0}".format(self.commit_id)
       return self.commit_id;
     def files(self):
       return self.commitDetails["files"];  
+    def getSHA(self, filename):
+      try:
+          return self.commitDetails["files"][filename]
+      except:
+          return ""      
     def remove_file(self, filename):
       if filename in commitDetails["files"]:
           del commitDetails["files"][filename];
     def parent(self):
       return self.commitDetails["parent"];
+    def mergedfrom(self):
+      return self.commitDetails["mergedFrom"];
     def setParent(self, parent):
       self.commitDetails["parent"] = parent;
     def time(self):
@@ -74,7 +80,11 @@ class Changeset(object):
         for oldF in oldCommitFiles:
             if oldF not in newCommitFiles:
                 self.m_removedFiles.append(oldF);     
-
+    def different(self):
+        if (self.m_removedFiles == []) and (self.m_newFiles == []) and (self.m_modifiedFiles == []):
+            return False
+        else:
+            return True
     def removedFiles(self):
         return self.m_removedFiles;
     def newFiles(self):
@@ -82,7 +92,6 @@ class Changeset(object):
     def modifiedFiles(self):
         return self.m_modifiedFiles;        
 
-    def fileChanged(self,fileName):import json
 
 class EV3Project(object):
     @classmethod
@@ -93,7 +102,7 @@ class EV3Project(object):
         data = {}
         data["head"] = 1;
         newP.uploadCommit(ev3data, "Initial Commit", who, host);    
-        with open(self.fullpath("project.json"), "w") as project_file:
+        with open(newP.fullpath("project.json"), "w") as project_file:
             json.dump(data, project_file);      
         return newP
      
@@ -121,7 +130,6 @@ class EV3Project(object):
         cid = 1;
 
         while(os.path.isfile(Commit.file_from_id(self.path, cid))):
-            print "{0}{1}".format(self.path, cid)
             commits.append(Commit.from_id(cid, self.path))
             cid = cid + 1
         return sorted(commits, key=methodcaller('time'), reverse=True)                
@@ -220,7 +228,7 @@ class EV3Project(object):
                         data = zf.read(fileName)
                         with open(self.fullpath("repo/"+m.hexdigest()), "wb") as outfile:
                             outfile.write(data)
-        commit = {"parent" : parent, "time" : time.time(), "name" : who, "host" : host, "comment" : comment, "files" : files}
+        commit = {"parent" : parent, "mergedFrom" : 0, "time" : time.time(), "name" : who, "host" : host, "comment" : comment, "files" : files}
         
         cid = self.findNextCommit();
         with open(self.fullpath("{0}.json".format(cid)), "w") as outfile:
@@ -232,12 +240,12 @@ class EV3Project(object):
         parents2 = [commit2.cid()]
                
         while not set(parents1) & set(parents2):
-            print "{0}:{1} - {2}.{3}".format(parents1, parents2,commit1.cid(),commit2.cid())
+#            print "{0}:{1} - {2}.{3}".format(parents1, parents2,commit1.cid(),commit2.cid())
             if(commit1.parent()):
-                commit1 = Commit.from_id(commit1.parent())
+                commit1 = Commit.from_id(commit1.parent(), self.path)
                 parents1.append(commit1.cid())
             if(commit2.parent()):
-                commit2 = Commit.from_id(commit2.parent())
+                commit2 = Commit.from_id(commit2.parent(), self.path)
                 parents2.append(commit2.cid()) 
         return (set(parents1) & set(parents2)).pop()   # will always find a match because they always end with 1
     
@@ -248,12 +256,12 @@ class EV3Project(object):
         if self.head == "":
             self.head = cid;
             data["head"] = self.head;
+            data["failedMerges"] = [];
         else:
             head_commit = Commit.from_id(self.head, self.path)
             id_commit = Commit.from_id(cid, self.path)
             # find common parent
             parent_cid = self.find_common_parent(head_commit, id_commit)
-            print "Parent:{0}->{1}->{2}".format(parent_cid, head_commit, id_commit)
             if (parent_cid == "") or (self.head == parent_cid):   # if you are uploading projects not using ev3hub treat as if you are directly after head
                 data["head"] = cid;   
             else:
@@ -263,17 +271,17 @@ class EV3Project(object):
                 changes_to_commit = Changeset(parent_commit, id_commit)                      
                 proposed_head_commit = head_commit;
                 
-                print "Changes_to_head:{0}".format(changes_to_head)
-                print "Changes_to_commit:{0}".format(changes_to_commit)
+#                print "Changes_to_head:{0}".format(changes_to_head)
+#                print "Changes_to_commit:{0}".format(changes_to_commit)
               
                 for filename in changes_to_commit.newFiles():
-                    if filename in changes_to_head.newFiles():   # should check for same SHA here
-                        errors.append("{0} added in both").format(filename)
+                    if (filename in changes_to_head.newFiles()) and (head_commit.getSHA(filename) != id_commit.getSHA(filename)):   
+                        errors.append("{0} added in both".format(filename))
                     else:
                         proposed_head_commit.files()[filename] = id_commit.files()[filename];
                 for filename in changes_to_commit.modifiedFiles():
-                    if filename in changes_to_head.modifiedFiles():   # should check for same SHA here
-                        errors.append("{0} modified in both").format(filename)
+                    if (filename in changes_to_head.newFiles()) and (head_commit.getSHA(filename) != id_commit.getSHA(filename)):    
+                        errors.append("{0} modified in both".format(filename))
                     else:
                         proposed_head_commit.files()[filename] = id_commit.files()[filename];    
                 for filename in changes_to_commit.removedFiles():
@@ -281,12 +289,20 @@ class EV3Project(object):
                         proposed_head_commit.remove_file(filename)                    
                 if not errors:
                     new_id = self.findNextCommit();
-                    newCommit = {"parent" : self.head, "time" : time.time(), "name" : "EV3Hub", "host" : "", "comment" : "Auto-merged from {0}".format(cid), 
+                    newCommit = {"parent" : self.head, "mergedfrom" : cid, "time" : time.time(), "name" : "EV3Hub", "host" : "", "comment" : "Auto-merged from {0}".format(cid), 
                                  "files" : proposed_head_commit.files()}
-                    with open(self.fullpath("{0}.json".format(new_id)), "w") as outfile:
-                        json.dump(newCommit, outfile)
-                    data["head"] = new_id;
-                    self.head = new_id;
+                    cs = Changeset(Commit(new_id, newCommit), id_commit)             
+                    if cs.different():
+                        print cs 
+                        with open(self.fullpath("{0}.json".format(new_id)), "w") as outfile:
+                            json.dump(newCommit, outfile)
+                        data["head"] = new_id;
+                        self.head = new_id;
+                    else:
+                        data["head"] = cid;
+                        self.head = cid;
+                else:
+                    data["failedMerges"] = data["failedMerges"].append(cid)
                 
         with open(self.fullpath("project.json"), "w") as project_file:
            json.dump(data, project_file);

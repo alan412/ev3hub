@@ -10,9 +10,14 @@
 </TR>
 </TABLE>
 
+<FORM method="post" action="diff">
+	<input type="submit" value="Diff - Disabled for now" disabled/>
 <TABLE width="100%" border="1">
-<TR><TD>id</TD><TD>Comments</TD><TD>Time</TD><TD>Who</TD><TD>Host</TD></TR>
+<TR><TD>1</TD><TD>2</TD><TD>id</TD><TD>parent</TD><TD>Comments</TD><TD>Time</TD><TD>Who</TD><TD>Host</TD></TR>
 	% for commit in commits:
-		<TR class={loop.cycle('even', 'odd')}> <TD><A HREF="download?cid=${commit.cid()}">${commit.cid()}</TD></A> <TD>${commit.comment()}</TD> <TD>${commit.timeStr()}</TD> <TD>${commit.name()}</TD> <TD>${commit.host()}</TD> </TR>
+		<TR class={loop.cycle('even', 'odd')}> <TD><input type="radio" name="diff1" value="${commit.cid()}"></TD> 
+			<TD><input type="radio" name="diff2" value="${commit.cid()}"></TD> 
+			<TD><A HREF="download?cid=${commit.cid()}">${commit.cid()}</TD></A> <TD>${commit.parent()}</TD><TD>${commit.comment()}</TD> <TD>${commit.timeStr()}</TD> <TD>${commit.name()}</TD> <TD>${commit.host()}</TD> </TR>
 	% endfor
 </TABLE>	
+</FORM>

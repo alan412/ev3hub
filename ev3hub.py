@@ -56,9 +56,7 @@ class Users(object):
             return False;
         else:
             return pwd_context.verify(password, self.users[username]['password'])
-
-
-        
+    
 class EV3hub(object):  
     def __init__(self):
         self.users = Users();
@@ -84,7 +82,7 @@ class EV3hub(object):
     
     def show_uploadpage(self, project, username, programmer, host):
         return self.template("upload.html", project = project, username = username, programmer = programmer, host = host)
-    
+        
     def get_projectlist(self, username):
         path = os.path.join('data', username);
         if os.path.exists(path):
@@ -206,9 +204,8 @@ class EV3hub(object):
 # TODO: do this for real            
            return merge_errors             
         username = Cookie('username').get('')
-        return self.mainpage('username')
-
-
+        return self.show_mainpage(username)
+        
                
 if __name__ == '__main__':
    # This is the configuration and starting of the service
