@@ -30,6 +30,8 @@ tr.commits:nth-child(even) {background-color: #f2f2f2}
 tr.notEquals {background-color: #880000; color: white;}
 tr.onlyOne {color: blue}
 tr.equals {color: gray}
+tr.failedMerge {background-color: tomato; color: white;}
+tr.head {background-color: silver;}
 
 th {
     background-color: #4CAF50;

@@ -101,6 +101,7 @@ class EV3Project(object):
         newP = cls(name, user);
         data = {}
         data["head"] = 1;
+        data["failedMerges"] = [];
         newP.uploadCommit(ev3data, "Initial Commit", who, host);    
         with open(newP.fullpath("project.json"), "w") as project_file:
             json.dump(data, project_file);      
@@ -113,15 +114,18 @@ class EV3Project(object):
         self.name = name;
         self.user = user;   # not sure why I am saving this....
         self.path = os.path.join('data', user, name)
+        self.failedMerges = [];
+        self.head = 1;
+        
         if not os.path.exists(self.path):
             os.makedirs(self.path)
             os.makedirs(self.fullpath('repo'))
             
-        self.head = 1;
         try:
            with open(self.fullpath("project.json"), "r") as project_file:
                data = json.loads(project_file.read()) 
                self.head = data["head"]
+               self.failedMerges = data["failedMerges"]
         except:
            pass   
     def getCommit(self, cid):
@@ -254,27 +258,25 @@ class EV3Project(object):
     def merge(self, cid):
         data = {};
         errors = [];
-
-        if self.head == "":
+        
+        if not self.head:
             self.head = cid;
-            data["head"] = self.head;
-            data["failedMerges"] = [];
-        else:
+        else:    
             head_commit = Commit.from_id(self.head, self.path)
             id_commit = Commit.from_id(cid, self.path)
             # find common parent
             parent_cid = self.find_common_parent(head_commit, id_commit)
             if (parent_cid == "") or (self.head == parent_cid):   # if you are uploading projects not using ev3hub treat as if you are directly after head
-                data["head"] = cid;   
+                self.head = cid;   
             else:
-# TODO: locking??
+                     # TODO: locking??
                 parent_commit = Commit.from_id(parent_cid, self.path)
                 changes_to_head = Changeset(parent_commit, head_commit)
                 changes_to_commit = Changeset(parent_commit, id_commit)                      
                 proposed_head_commit = head_commit;
                 
-#                print "Changes_to_head:{0}".format(changes_to_head)
-#                print "Changes_to_commit:{0}".format(changes_to_commit)
+                print "Changes_to_head:{0}".format(changes_to_head)
+                print "Changes_to_commit:{0}".format(changes_to_commit)
               
                 for filename in changes_to_commit.newFiles():
                     if (filename in changes_to_head.newFiles()) and (head_commit.getSHA(filename) != id_commit.getSHA(filename)):   
@@ -282,20 +284,21 @@ class EV3Project(object):
                     else:
                         proposed_head_commit.files()[filename] = id_commit.files()[filename];
                 for filename in changes_to_commit.modifiedFiles():
-                    if (filename in changes_to_head.newFiles()) and (head_commit.getSHA(filename) != id_commit.getSHA(filename)):    
+                    if (filename in changes_to_head.modifiedFiles()) and (head_commit.getSHA(filename) != id_commit.getSHA(filename)):    
                         errors.append("{0} modified in both".format(filename))
                     else:
                         proposed_head_commit.files()[filename] = id_commit.files()[filename];    
                 for filename in changes_to_commit.removedFiles():
                     if (filename in changes_to_head.modifiedFiles()):
                         proposed_head_commit.remove_file(filename)                    
+                print "Errors: {0}".format(errors)
+                
                 if not errors:
                     new_id = self.findNextCommit();
                     newCommit = {"parent" : self.head, "mergedfrom" : cid, "time" : time.time(), "name" : "EV3Hub", "host" : "", "comment" : "Auto-merged from {0}".format(cid), 
                                  "files" : proposed_head_commit.files()}
                     cs = Changeset(Commit(new_id, newCommit), id_commit)             
                     if cs.different():
-                        print cs 
                         with open(self.fullpath("{0}.json".format(new_id)), "w") as outfile:
                             json.dump(newCommit, outfile)
                         data["head"] = new_id;
@@ -304,8 +307,10 @@ class EV3Project(object):
                         data["head"] = cid;
                         self.head = cid;
                 else:
-                    data["failedMerges"] = data["failedMerges"].append(cid)
-                
+                    self.failedMerges.append(cid)
+        data = {}
+        data["head"] = self.head;
+        data["failedMerges"] = self.failedMerges        
         with open(self.fullpath("project.json"), "w") as project_file:
            json.dump(data, project_file);
         

@@ -77,8 +77,8 @@ class EV3hub(object):
             return self.projects()
         ev3P = ev3project.EV3Project(project, username)
         commits = ev3P.getListOfCommits()
-        
-        return self.template("mainpage.html", username = username, project = project, commits = commits, error=error)
+               
+        return self.template("mainpage.html", username = username, project = project, commits = commits, failedMerges = ev3P.failedMerges, head= ev3P.head, error=error)
         
     def show_createaccountpage(self, error=''):
         return self.template("createAccount.html", error = error)
@@ -232,7 +232,7 @@ class EV3hub(object):
             if filename not in filelist:
                 filelist.append(filename)                     
         
-        for f in filelist:
+        for f in sorted(filelist, key=unicode.lower):
             files.append({'name' : f, '1' : commit1.getSHA(f), '2' : commit2.getSHA(f)})
             
         return self.show_diffpage(project,commit1, commit2, files)       
