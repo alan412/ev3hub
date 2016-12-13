@@ -1,8 +1,6 @@
 * {
   font-size: inherit;
   font-family: Segoe UI, Roboto, Droid Sans, Verdana, Tahoma, Serif;
-  padding: 0px;
-  margin: 0px;
 }
 
 h1.error{
@@ -20,7 +18,18 @@ table.commits, td.commits {
     border-right-style: 1px solid black;
 }
 
-tr:nth-child(even) {background-color: #f2f2f2}
+table.diff{
+    border: 1px solid black;
+	padding: 0px;
+	margin: 20px;
+    margin-left:auto; 
+    margin-right:auto;
+}
+
+tr.commits:nth-child(even) {background-color: #f2f2f2}
+tr.notEquals {background-color: #880000; color: white;}
+tr.onlyOne {color: blue}
+tr.equals {color: gray}
 
 th {
     background-color: #4CAF50;

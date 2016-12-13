@@ -35,7 +35,7 @@ class Commit(object):
     def time(self):
       return self.commitDetails["time"];
     def timeStr(self):
-      return time.asctime(time.localtime(self.time()));
+      return time.strftime("%a %b %d, %Y %I:%M %p %Z", time.localtime(self.time()));
     def name(self):
       return self.commitDetails["name"];
     def host(self):
@@ -124,7 +124,9 @@ class EV3Project(object):
                self.head = data["head"]
         except:
            pass   
-
+    def getCommit(self, cid):
+        return Commit.from_id(cid, self.path)
+        
     def getListOfCommits(self):
         commits = [];
         cid = 1;

@@ -1,0 +1,26 @@
+<script>
+function goBack() {
+    window.history.back();
+}
+</script>
+
+<%inherit file="base.html"/>
+<H1 align="center">${project}</H1>
+
+<TABLE class="diff" width="80%">
+<TR><TH width="5%"></TH><TH width="45%">${commit1.cid()} -  ${commit1.timeStr()}</TH><TH width="45%">${commit2.cid()} - ${commit2.timeStr()}</TH></TR>
+<TR><TH></TH><TH>${commit1.comment()}</TH><TH>${commit2.comment()}</TH></TR>
+% for file in files:
+   % if file['1'] == file['2']:
+     <TR class="equals"><TD>==</TD><TD>${file['name']}<TD>${file['name']}</TD></TR>
+   % elif file['1'] and file['2']:
+     <TR class="notEquals"><TD>!=</TD><TD>${file['name']}<TD>${file['name']}</TD></TR>
+   % elif file['1']:
+     <TR class="onlyOne"><TD>+-</TD><TD>${file['name']}<TD></TD></TR>  
+   % else:
+     <TR class="onlyOne"><TD>-+</TD><TD><TD>${file['name']}</TD></TR>  
+   % endif    
+% endfor
+</TABLE>
+<CENTER><button onclick="goBack()">Go Back</button></CENTER>
+

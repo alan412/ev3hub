@@ -12,12 +12,12 @@
 </TABLE>
 
 <FORM method="post" action="diff">
-	<input type="submit" value="Diff - Disabled for now" disabled/>
+	<input type="submit" value="Diff" />
 <TABLE class="commits" width="100%" border="1">
 <TR><TH>1</TH><TH>2</TH><TH>id</TH><TH>parent</TH><TH>Comments</TH><TH>Time</TH><TH>Who</TH><TH>Host</TH></TR>
 	% for commit in commits:
-		<TR class={loop.cycle('even', 'odd')}> <TD class="commits"><input type="radio" name="diff1" value="${commit.cid()}"></TD> 
-			<TD class="commits"><input type="radio" name="diff2" value="${commit.cid()}"></TD> 
+		<TR class={loop.cycle('even', 'odd')}> <TD class="commits"><input type="radio" name="cid1" value="${commit.cid()}"></TD> 
+			<TD class="commits"><input type="radio" name="cid2" value="${commit.cid()}"></TD> 
 			<TD class="commits"><A HREF="download?cid=${commit.cid()}">${commit.cid()}</TD></A> 
 			<TD class="commits">${commit.parent()}</TD>
 			<TD class="commits">${commit.comment()}</TD> 

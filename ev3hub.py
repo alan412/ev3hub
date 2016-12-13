@@ -68,6 +68,9 @@ class EV3hub(object):
     def show_loginpage(self, error=''):      
         return self.template("login.html", error = error)
     
+    def show_diffpage(self, project, commit1, commit2, files, error=''):
+        return self.template("diff.html", project=project, commit1 = commit1, commit2 = commit2, files = files, error = error)
+    
     def show_mainpage(self, username, error=''):
         project = Cookie('project').get("")
         if not project:
@@ -208,7 +211,31 @@ class EV3hub(object):
          
         username = Cookie('username').get('')
         return self.show_mainpage(username, error)
-               
+        
+    @cherrypy.expose
+    def diff(self, cid1, cid2):
+        error = ''
+        files = []
+        filelist = [];
+        
+        project = Cookie('project').get('')
+        
+        ev3P = ev3project.EV3Project(project, Cookie('username').get(''))
+        commit1 = ev3P.getCommit(cid1)
+        commit2 = ev3P.getCommit(cid2)
+
+        for filename in commit1.files():
+            if filename not in filelist:
+                filelist.append(filename)   
+        
+        for filename in commit2.files():
+            if filename not in filelist:
+                filelist.append(filename)                     
+        
+        for f in filelist:
+            files.append({'name' : f, '1' : commit1.getSHA(f), '2' : commit2.getSHA(f)})
+            
+        return self.show_diffpage(project,commit1, commit2, files)       
 if __name__ == '__main__':
    # This is the configuration and starting of the service
    cherrypy.config.update({'server.socket_host' : "0.0.0.0",
