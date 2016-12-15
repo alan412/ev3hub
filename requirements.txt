@@ -1,0 +1,5 @@
+CherryPy==8.1.2
+Mako==1.0.6
+MarkupSafe==0.23
+passlib==1.7.0
+six==1.10.0
