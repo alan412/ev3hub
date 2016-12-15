@@ -2,10 +2,19 @@ import cherrypy
 import os
 import ev3project
 import json
+import string
 from mako.template import Template
 from mako.lookup import TemplateLookup
-
 from passlib.apps import custom_app_context as pwd_context
+
+# this is for Mike Spradling who found the bug which let him
+# violate the system.
+def sanitize(filename):
+    valid_chars = "-_.() %s%s" % (string.ascii_letters, string.digits)
+    clean_filename = ''.join(c for c in filename if c in valid_chars)
+    if clean_filename.startswith('.'):
+       clean_filename = '_' + clean_filename
+    return clean_filename
 
 class Cookie(object):
     def __init__(self, name):
@@ -101,7 +110,7 @@ class EV3hub(object):
     
     @cherrypy.expose
     def projects(self):
-        host = Cookie('host').get(cherrypy.request.headers['Remote-Addr']);
+        host = Cookie('host').get(cherrypy.request.headers['X-Real-IP']);
         username = Cookie('username').get()
         programmer = Cookie('who').get()
         if not username:
@@ -119,11 +128,12 @@ class EV3hub(object):
                 
     @cherrypy.expose
     def newProject(self, project, who, host, ev3file):
+        project = sanitize(project)
         username = Cookie('username').get()
         if not username:
            return self.show_loginpage('')       
         if project in self.get_projectlist(username):
-           host = Cookie('host').get(cherrypy.request.headers['Remote-Addr']);
+           host = Cookie('host').get(host);
            programmer = Cookie('who').get()            
            return self.template("projects.html",projects=self.get_projectlist(username),host=host,username=username,programmer=programmer, error="Duplicate Project")
               
@@ -154,7 +164,7 @@ class EV3hub(object):
         elif self.users.get(username):
             error = "Username in use!"
         else:
-            self.users.add(username, email, password);
+            self.users.add(sanitize(username), email, password);
         if error:
             return self.show_createaccountpage(error);
         
@@ -170,7 +180,7 @@ class EV3hub(object):
     
     @cherrypy.expose
     def upload(self):
-        host = Cookie('host').get(cherrypy.request.headers['Remote-Addr']);
+        host = Cookie('host').get(cherrypy.request.headers['X-Real-IP']);
         project = Cookie('project').get('')
         username = Cookie('username').get('')
         programmer = Cookie('who').get('')
@@ -238,11 +248,11 @@ class EV3hub(object):
         return self.show_diffpage(project,commit1, commit2, files)       
 if __name__ == '__main__':
    # This is the configuration and starting of the service
-   cherrypy.config.update({'server.socket_host' : "0.0.0.0",
-                           'server.socket_port' : 8000})    
+   cherrypy.config.update({'server.socket_host' : "127.0.0.1",
+                           'server.socket_port' : 8080})    
   
    file_path = os.getcwd()
-   
+ 
    cherrypy.quickstart(EV3hub(),'/', 
          {
            '/':
