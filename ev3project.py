@@ -126,6 +126,8 @@ class EV3Project(object):
                data = json.loads(project_file.read()) 
                self.head = data["head"]
                self.failedMerges = data["failedMerges"]
+               if(self.failedMerges is None):
+                   self.failedMerges = []
         except:
            pass   
     def getCommit(self, cid):
