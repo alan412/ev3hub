@@ -154,9 +154,9 @@ class EV3hub(object):
         return self.show_mainpage(username)    
     @cherrypy.expose
     def login(self,username=None,password=None):
+        username = username.lower()
         if self.users.verifyPassword(username, password):
             Cookie('username').set(username)
-            print "Logged in as {0}".format(username)
             return self.show_mainpage(username);
         else:
             return self.show_loginpage("Username and password don't match")
@@ -168,7 +168,7 @@ class EV3hub(object):
     @cherrypy.expose
     def createUser(self, username, email, password, password2):
         error = ''
-        username = sanitize(username)
+        username = sanitize(username.lower())
         if password != password2:
             error = "Password's don't match!"
         elif self.users.get(username):
