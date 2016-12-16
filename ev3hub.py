@@ -16,6 +16,12 @@ def sanitize(filename):
        clean_filename = '_' + clean_filename
     return clean_filename
 
+def getHostname():
+    try:
+        return cherrypy.request.headers['X-Real-IP']
+    except:
+        return cherrypy.request.headers['Remote-Addr']
+
 class Cookie(object):
     def __init__(self, name):
         self.name = name;
@@ -95,6 +101,15 @@ class EV3hub(object):
     def show_uploadpage(self, project, username, programmer, host):
         return self.template("upload.html", project = project, username = username, programmer = programmer, host = host)
         
+    def show_changeprojectpage(self, error=''):
+        host = Cookie('host').get(getHostname());
+        username = Cookie('username').get()
+        programmer = Cookie('who').get()
+        if not username:
+            return self.show_loginpage('')
+            
+        return self.template("projects.html",projects=self.get_projectlist(username),host=host,username=username,programmer=programmer,error=error)
+        
     def get_projectlist(self, username):
         path = os.path.join('data', username);
         if os.path.exists(path):
@@ -110,14 +125,8 @@ class EV3hub(object):
     
     @cherrypy.expose
     def projects(self):
-        host = Cookie('host').get(cherrypy.request.headers['X-Real-IP']);
-        username = Cookie('username').get()
-        programmer = Cookie('who').get()
-        if not username:
-           print "No username"
-           return self.show_loginpage('')       
-         
-        return self.template("projects.html",projects=self.get_projectlist(username),host=host,username=username,programmer=programmer)
+        return self.show_changeprojectpage()
+    
     @cherrypy.expose
     def changeProject(self, project):
         username = Cookie('username').get()
@@ -133,15 +142,14 @@ class EV3hub(object):
         if not username:
            return self.show_loginpage('')       
         if project in self.get_projectlist(username):
-           host = Cookie('host').get(host);
-           programmer = Cookie('who').get()            
-           return self.template("projects.html",projects=self.get_projectlist(username),host=host,username=username,programmer=programmer, error="Duplicate Project")
-              
-        ev3data = ev3file.file.read();
-        Cookie('project').set(project)
+           return self.show_changeprojectpage('Duplicate Project')
+        try:      
+           ev3data = ev3file.file.read();
+           ev3P = ev3project.EV3Project.newProject(username, project, ev3data, who, host)
+           Cookie('project').set(project)
+        except:
+           return self.show_changeprojectpage('Error in Project')
         
-        ev3P = ev3project.EV3Project.newProject(username, project, ev3data, who, host)
-
         return self.show_mainpage(username)    
     @cherrypy.expose
     def login(self,username=None,password=None):
@@ -181,7 +189,7 @@ class EV3hub(object):
     
     @cherrypy.expose
     def upload(self):
-        host = Cookie('host').get(cherrypy.request.headers['X-Real-IP']);
+        host = Cookie('host').get(getHostname());
         project = Cookie('project').get('')
         username = Cookie('username').get('')
         programmer = Cookie('who').get('')
