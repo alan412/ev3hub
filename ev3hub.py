@@ -250,16 +250,15 @@ class EV3hub(object):
             if filename not in filelist:
                 filelist.append(filename)                     
         
-        for f in sorted(filelist, key=unicode.lower):
-            sha1 = commit1.getSHA(f)
-            sha2 = commit2.getSHA(f)
+        for filename in sorted(filelist, key=unicode.lower):
+            sha1 = commit1.getSHA(filename)
+            sha2 = commit2.getSHA(filename)
             if (sha1 == sha2) and (not sha1):   # is a variable
                 if filename in commit1.files():
                     sha1 = 'var'
                 if filename in commit2.files():
                     sha2 = 'var'
-            
-            files.append({'name' : f, '1' : sha1, '2' : sha2})
+            files.append({'name' : filename, '1' : sha1, '2' : sha2})
             
         return self.show_diffpage(project,commit1, commit2, files)       
 if __name__ == '__main__':
