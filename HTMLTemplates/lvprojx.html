@@ -26,7 +26,7 @@
 					</SourceFileReference>
 				% endfor
 				% for myblock in myblockdefs:
-					<SourceFileReference StoragePath="$myblock" RelativeStoragePath="$myblock" OverridingDocumentTypeIdentifier="X3VIDocument" DocumentTypeIdentifier="NationalInstruments.LabVIEW.VI.Modeling.VirtualInstrument" Name="${myblock.replace('.','\\.').replace(' ','\\ ')}" Bindings="Envoy,DefinitionReference,SourceFileReference,X3VIDocument" >
+					<SourceFileReference StoragePath="${myblock}" RelativeStoragePath="${myblock}" OverridingDocumentTypeIdentifier="X3VIDocument" DocumentTypeIdentifier="NationalInstruments.LabVIEW.VI.Modeling.VirtualInstrument" Name="${myblock.replace('.','\\.').replace(' ','\\ ')}" Bindings="Envoy,DefinitionReference,SourceFileReference,X3VIDocument" >
 						<X3DocumentSettings ShowFileOnStartup="False" IsTeacherOnlyFile="False" IsHiddenDependency="False" xmlns="http://www.ni.com/X3DocumentSettings.xsd" />
 					</SourceFileReference>
 					<DefinitionReference DocumentTypeIdentifier="NationalInstruments.ExternalFileSupport.Modeling.ExternalFileType" Name="${myblock.replace('.','\\.').replace(' ','\\ ')}\.mbxml" Bindings="Envoy,DefinitionReference,EmbeddedReference,ProjectItemDragDropDefaultService" />
@@ -39,7 +39,7 @@
 				% if vars:
 					<NamedGlobalData xmlns="http://www.ni.com/X3NamedGlobalData.xsd">
 					% for v in vars:
-						<Datum Name="$v" Kind="Variable" Type="$vars[v]" />
+						<Datum Name="${v}" Kind="Variable" Type="${vars[v]}" />
 					% endfor
 					</NamedGlobalData>
 				% else:
@@ -100,7 +100,7 @@
 	% for media in medias:
 		<Namespace Name="${media.replace('.','\\.').replace(' ','\\ ')}">
 	        <ExternalFile xmlns="http://www.ni.com/ExternalFile.xsd">
-	            <RelativeStoragePath>$media</RelativeStoragePath>
+	            <RelativeStoragePath>${media}</RelativeStoragePath>
 	            <StoragePath />
 	        </ExternalFile>
 	    </Namespace>
