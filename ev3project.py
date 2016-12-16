@@ -214,6 +214,8 @@ class EV3Project(object):
         in_memory_zip = cStringIO.StringIO(ev3data)
         with zipfile.ZipFile(in_memory_zip, "r", zipfile.ZIP_DEFLATED, False) as zf:
             for fileName in zf.namelist():
+                if zf.getinfo(fileName).file_size > 1024*1024*1024:  # don't allow larger than 1MB
+                    raise zipfile.BadZipfile 
                 if fileName == "ev3hub.json":
                     with zf.open("ev3hub.json", 'r') as json_file:
                         data = json.loads(json_file.read())
