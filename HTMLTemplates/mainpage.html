@@ -18,13 +18,17 @@
 	% for commit in commits:
 	   % if "{0}".format(commit.cid()) in failedMerges: 
 	      <TR class="failedMerge">
+  		    <TD class="commits"><input type="radio" name="cid1" value="${commit.cid()}"></TD> 
+  			<TD class="commits"><input type="radio" name="cid2" value="${commit.cid()}"></TD>
 	   % elif "{0}".format(commit.cid()) == head:
 	      <TR class="head">
+  		    <TD class="commits"><input type="radio" name="cid1" value="${commit.cid()}" checked="checked"></TD> 
+  			<TD class="commits"><input type="radio" name="cid2" value="${commit.cid()}" checked="checked"></TD>
 	   % else:
 	      <TR>
+  		    <TD class="commits"><input type="radio" name="cid1" value="${commit.cid()}"></TD> 
+  			<TD class="commits"><input type="radio" name="cid2" value="${commit.cid()}"></TD>
 	   % endif
-		    <TD class="commits"><input type="radio" name="cid1" value="${commit.cid()}"></TD> 
-			<TD class="commits"><input type="radio" name="cid2" value="${commit.cid()}"></TD> 
 			<TD class="commits"><A HREF="download?cid=${commit.cid()}">${commit.cid()}</TD></A> 
 			<TD class="commits">${commit.parent()}</TD>
 			<TD class="commits">${commit.comment()}</TD> 
