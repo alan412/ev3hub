@@ -249,21 +249,20 @@ class EV3Project(object):
         return cid;       
     
     def find_common_parent(self, commit1, commit2):
-        parents1 = [commit1.cid()]
-        parents2 = [commit2.cid()]
+        parents1 = ["{0}".format(commit1.cid())]
+        parents2 = ["{0}".format(commit2.cid())]
         
         while not set(parents1) & set(parents2):
 #            print "{0}:{1} - {2}.{3}".format(parents1, parents2,commit1.cid(),commit2.cid())
             if(commit1.parent()):
                 commit1 = Commit.from_id(commit1.parent(), self.path)
-                parents1.append(commit1.cid())
+                parents1.append("{0}".format(commit1.cid()))
             if(commit2.parent()):
                 commit2 = Commit.from_id(commit2.parent(), self.path)
-                parents2.append(commit2.cid()) 
+                parents2.append("{0}".format(commit2.cid())) 
             elif commit1.parent() == commit2.parent():   # in this case they are both 0
-                parents1.append(0);
-                parents2.append(0);
-                
+                parents1.append("0");
+                parents2.append("0");
         return (set(parents1) & set(parents2)).pop()   
     
     def merge(self, cid):
@@ -282,9 +281,9 @@ class EV3Project(object):
             changes_to_head = Changeset(parent_commit, head_commit)
             changes_to_commit = Changeset(parent_commit, id_commit)                      
             proposed_head_commit = head_commit;
-            
-            print "Changes_to_head:{0}".format(changes_to_head)
-            print "Changes_to_commit:{0}".format(changes_to_commit)
+#            print "Head:{0} ID: {1} Parent {2}".format(self.head, cid, parent_cid) 
+#            print "Changes_to_head:{0}".format(changes_to_head)
+#            print "Changes_to_commit:{0}".format(changes_to_commit)
           
             for filename in changes_to_commit.newFiles():
                 if (filename in changes_to_head.newFiles()) and (head_commit.getSHA(filename) != id_commit.getSHA(filename)):   
