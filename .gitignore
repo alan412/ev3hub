@@ -4,5 +4,6 @@
 .DS_Store
 # keep out user data
 data/
+sessions/
 # For virtual environments
 venv/
