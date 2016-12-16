@@ -28,15 +28,14 @@ class Cookie(object):
     def get(self, default=''):
         result = default
         try:
-           result = cherrypy.request.cookie[self.name].value;
+           result = cherrypy.session.get(self.name);
         except:
            self.set(default);
         return result;
-    def set(self, value, expires=3600*24*365):
-        cherrypy.response.cookie[self.name] = value
-        cherrypy.response.cookie[self.name]['expires'] = expires  
-        cherrypy.request.cookie[self.name] = value;   # Not sure this is kosher, this is in case it is checked before a roundtrip
+    def set(self, value):
+        cherrypy.session[self.name] = value
     def delete(self):
+        cherrypy.session.pop(self.name, None)
         self.set('', 0)  # Way to delete a cookie is to set it with an expiration time of immediate
 
 class Users(object):
@@ -92,7 +91,7 @@ class EV3hub(object):
             return self.projects()
         ev3P = ev3project.EV3Project(project, username)
         commits = ev3P.getListOfCommits()
-               
+                   
         return self.template("mainpage.html", username = username, project = project, commits = commits, failedMerges = ev3P.failedMerges, head= ev3P.head, error=error)
         
     def show_createaccountpage(self, error=''):
@@ -181,9 +180,7 @@ class EV3hub(object):
     
     @cherrypy.expose
     def logout(self):
-        Cookie('username').delete()
-        Cookie('project').delete()
-        Cookie('who').delete()
+        cherrypy.lib.sessions.expire()
          
         return self.show_loginpage('')
     
@@ -267,11 +264,15 @@ if __name__ == '__main__':
            '/':
            {
                'tools.staticdir.root' : file_path,
+               'tools.sessions.on' : True,
+               'tools.sessions.storage_type' : 'file',
+               'tools.sessions.storage_path' : os.path.join(file_path, 'sessions'),
+               'tools.sessions.timeout' : 60 * 24 * 365    # one year
            },
            '/favicon.ico':
            {
                'tools.staticfile.on' : True,
-               'tools.staticfile.filename' : file_path + '/static/favicon.ico'
+               'tools.staticfile.filename' : os.path.join(file_path, 'static/favicon.ico')
            },
            '/static':
            {
