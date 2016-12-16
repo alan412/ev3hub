@@ -273,7 +273,7 @@ if __name__ == '__main__':
            {
                'tools.staticdir.root' : file_path,
                'tools.sessions.on' : True,
-               'tools.sessions.storage_type' : 'file',
+               'tools.sessions.storage_class' : cherrypy.lib.sessions.FileSession,
                'tools.sessions.storage_path' : os.path.join(file_path, 'sessions'),
                'tools.sessions.timeout' : 60 * 24 * 365    # one year
            },
