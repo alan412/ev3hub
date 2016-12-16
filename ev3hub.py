@@ -76,7 +76,7 @@ class Users(object):
 class EV3hub(object):  
     def __init__(self):
         self.users = Users();
-        self.lookup = TemplateLookup(directories=['HTMLTemplates'])
+        self.lookup = TemplateLookup(directories=['HTMLTemplates'],default_filters=['h'])
         
     def template(self, name, **kwargs):
         return self.lookup.get_template(name).render(**kwargs);
