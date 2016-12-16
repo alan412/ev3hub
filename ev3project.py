@@ -51,7 +51,7 @@ class Commit(object):
     
     @classmethod
     def from_id(cls, cid, path):
-      if cid == 0:
+      if "{0}".format(cid) == "0":
           commitDetails = {"parent" : 0, "mergedFrom" : 0, "time" : time.time(), "name" : "", "host" : "", "comment" : "", "files" : {}}
           return cls(cid, commitDetails)
       return cls.from_file(cid, open(cls.file_from_id(path, cid), "r"))
