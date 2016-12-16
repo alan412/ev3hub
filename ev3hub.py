@@ -29,6 +29,8 @@ class Cookie(object):
         result = default
         try:
            result = cherrypy.session.get(self.name);
+	   if not result:
+              self.set(default)
         except:
            self.set(default);
         return result;
