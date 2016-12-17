@@ -13,7 +13,7 @@ import argparse
 def sanitize(filename):
     valid_chars = "-_.() %s%s" % (string.ascii_letters, string.digits)
     clean_filename = ''.join(c for c in filename if c in valid_chars)
-    if clean_filename.startswith('.'):
+    if clean_filename.startswith(('.',' ')):
        clean_filename = '_' + clean_filename
     return clean_filename
 
@@ -146,6 +146,8 @@ class EV3hub(object):
            return self.show_loginpage('')       
         if project in self.get_projectlist(username):
            return self.show_changeprojectpage('Duplicate Project')
+        if not project:   # if blank
+           return self.show_changeprojectpage('Blank name for project')
         try:      
            ev3data = ev3file.file.read();
            ev3P = ev3project.EV3Project.newProject(username, project, ev3data, who, host)
