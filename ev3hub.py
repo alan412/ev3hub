@@ -82,7 +82,8 @@ class EV3hub(object):
     def template(self, name, **kwargs):
         return self.lookup.get_template(name).render(**kwargs);
           
-    def show_loginpage(self, error=''):      
+    def show_loginpage(self, error=''):
+        cherrypy.session.regenerate();      
         return self.template("login.html", error = error)
     
     def show_diffpage(self, project, commit1, commit2, files, error=''):
