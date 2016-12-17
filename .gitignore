@@ -5,5 +5,7 @@
 # keep out user data
 data/
 sessions/
+# keep out log files
+*.log
 # For virtual environments
 venv/
