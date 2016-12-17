@@ -1,8 +1,8 @@
 ## base.html
-<%page expression_filter="h"/>
 <html>
 	<head>
 		<link rel="stylesheet" type="text/css" href="static/style.css"/>
+	    <title>${self.title()}</title>
 	</head>
     <body>
 % if error is not UNDEFINED:
