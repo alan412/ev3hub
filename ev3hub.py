@@ -6,6 +6,7 @@ import string
 from mako.template import Template
 from mako.lookup import TemplateLookup
 from passlib.apps import custom_app_context as pwd_context
+import argparse
 
 # this is for Mike Spradling who found the bug which let him
 # violate the system.
@@ -262,31 +263,8 @@ class EV3hub(object):
             
         return self.show_diffpage(project,commit1, commit2, files)       
 if __name__ == '__main__':
-   # This is the configuration and starting of the service
-   cherrypy.config.update({'server.socket_host' : "127.0.0.1",
-                           'server.socket_port' : 8080})    
-  
-   file_path = os.getcwd()
- 
-   cherrypy.quickstart(EV3hub(),'/', 
-         {
-           '/':
-           {
-               'tools.staticdir.root' : file_path,
-               'tools.sessions.on' : True,
-               'tools.sessions.storage_class' : cherrypy.lib.sessions.FileSession,
-               'tools.sessions.storage_path' : os.path.join(file_path, 'sessions'),
-               'tools.sessions.timeout' : 60 * 24 * 365    # one year
-           },
-           '/favicon.ico':
-           {
-               'tools.staticfile.on' : True,
-               'tools.staticfile.filename' : os.path.join(file_path, 'static/favicon.ico')
-           },
-           '/static':
-           {
-               'tools.staticdir.on' : True,
-               'tools.staticdir.dir' : 'static'
-           },
-         }
-      )
+    parser = argparse.ArgumentParser(description="Version Control for ev3")
+    parser.add_argument('conf')
+    args = parser.parse_args()   
+        
+    cherrypy.quickstart(EV3hub(),'', args.conf)
