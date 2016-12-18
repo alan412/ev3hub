@@ -135,6 +135,8 @@ class EV3hub(object):
         username = Cookie('username').get()
         if not username:
             return self.show_loginpage('')
+        if not project in self.get_projectlist(username):
+            return self.show_changeprojectpage('Please select an existing project')
         Cookie('project').set(project)
         return self.show_mainpage(username)
                 
