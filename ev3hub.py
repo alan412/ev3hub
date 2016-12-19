@@ -154,6 +154,8 @@ class EV3hub(object):
            ev3data = ev3file.file.read();
            ev3P = ev3project.EV3Project.newProject(username, project, ev3data, who, host)
            Cookie('project').set(project)
+           Cookie('who').set(who)
+           Cookie('host').set(host)
         except:
            return self.show_changeprojectpage('Error in Project')
         
