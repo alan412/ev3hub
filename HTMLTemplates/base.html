@@ -1,4 +1,7 @@
 ## base.html
+<!DOCTYPE html>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+${self.scripts()}
 <html>
 	<head>
 		<link rel="stylesheet" type="text/css" href="static/style.css"/>
@@ -9,9 +12,11 @@
 	    <H1 class="error">${error}</H1>
 % endif		
         ${self.body()}
+<div id="footer">
 <HR/>
 <p>
 LEGO<sup>&reg;</sup> is a trademark of the LEGO Group of companies which does not sponsor, authorize or endorse this site.
 </p>
+</div>
     </body>
 </html>

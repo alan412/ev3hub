@@ -1,7 +1,12 @@
+<%def name="scripts()">
+
+</%def>
+
 <%def name="title()">EV3 Hub - ${project}</%def>
 <%inherit file="base.html"/>
 
 
+<div id="wrapper">
 <H3 align=right>Logged in as ${username}. <A HREF="logout">logout</A></H3>
 <TABLE align="center">
 <TD><H1 align=right><A HREF="projects">Project: ${project}</A></H1></TD>
@@ -12,9 +17,19 @@
 <TD align="center"><H1><A HREF="upload">Upload (Commit)</A></H1></TD>
 </TR>
 </TABLE>
+<button id="diffBtn">Show Diff</button>
+<div id="diffModal" class="modal">
+	<div class="modal-content">
+		<div class="modal-header">
+		   <span class="close">&times;</span>
+		   <h2>Diff - ${project}</h2>
+		</div>
+		<div id="diff" class="modal-body">
+			<p>difference table would go here</p>
+		</div>
+	</div>
+</div>
 
-<FORM method="post" action="diff">
-	<input type="submit" value="Diff" />
 <TABLE class="commits" width="100%" border="1">
 <TR><TH>1</TH><TH>2</TH><TH>id</TH><TH>parent</TH><TH>Comments</TH><TH>Time</TH><TH>Who</TH><TH>Host</TH></TR>
 	% for commit in commits:
@@ -39,4 +54,37 @@
 			<TD class="commits">${commit.host()}</TD> </TR>
 	% endfor
 </TABLE>	
-</FORM>
+</div>
+<script>
+// Get the modal
+var modal = document.getElementById('diffModal');
+
+// Get the button that opens the modal
+var btn = document.getElementById("diffBtn");
+
+// Get the <span> element that closes the modal
+var span = document.getElementsByClassName("close")[0];
+
+// When the user clicks on the button, open the modal 
+btn.onclick = function() {
+	var cid1_val = $("input[name=cid1]:checked").val();
+	var cid2_val = $("input[name=cid2]:checked").val();
+
+	$.post("diff", {cid1: cid1_val, cid2:cid2_val}, function(result){
+		$("#diff").html(result);
+	} );
+    modal.style.display = "block";
+}
+
+// When the user clicks on <span> (x), close the modal
+span.onclick = function() {
+    modal.style.display = "none";
+}
+
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function(event) {
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}
+</script>

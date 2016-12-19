@@ -1,12 +1,21 @@
 <script>
-function goBack() {
-    window.history.back();
-}
+var sameShown = true;
+
+$("#showSameBtn").click(function(){
+	if(sameShown){
+		$("#showSameBtn").text("Show ones that are the same")
+		$(".equals").hide();
+		sameShown = false;
+	}
+	else{
+		$("#showSameBtn").text("Hide ones that are the same")
+		$(".equals").show();
+		sameShown = true;		
+	}
+})	
 </script>
 
-<%def name="title()">EV3 Hub:Diff</%def>
-<%inherit file="base.html"/>
-<H1 align="center">${project}</H1>
+<CENTER><button id="showSameBtn">Hide ones that are the same</button></CENTER>
 
 <TABLE class="diff" width="80%">
 <TR><TH width="5%"></TH><TH width="45%">${commit1.cid()} -  ${commit1.timeStr()}</TH><TH width="45%">${commit2.cid()} - ${commit2.timeStr()}</TH></TR>
@@ -23,5 +32,4 @@ function goBack() {
    % endif    
 % endfor
 </TABLE>
-<CENTER><button onclick="goBack()">Go Back</button></CENTER>
 
