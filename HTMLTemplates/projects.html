@@ -18,13 +18,16 @@
 <form method="post" action="newProject" enctype="multipart/form-data">
 <H1>New Project</H1>
 <br/>
-<table>
-<tr/>
-<P>Only characters allowed in project names are: letters, numbers, spaces, periods, dashes, underscores, and parenthesis. Any other characters will be removed</P> 
-<tr><td>Project Name:</td><td><input type="text" value="" name="project"/></td></tr>
-<tr><td>Programmer:</td><td><input type="text" value="${programmer}" name="who"/></td></tr>
-<tr><td>Host Computer:</td><td><input type="text" value="${host}" name="host"/></td></tr>
-<tr><td><input type="file" name="ev3file"/></td></tr>
-<tr><td><input type="submit" value="Create"/></td></tr>
-</table>
+<OL>
+<LI>Enter the name of the new project.  Only characters allowed in project names are: letters, numbers, spaces, periods, dashes, underscores, and parenthesis. Any other characters will be removed</LI>
+<input type="text" value="" name="project"/>
+<LI>Enter the name of the programmer that did the first version</LI>
+<input type="text" value="${programmer}" name="who"/>
+<LI>Enter the name of the computer you are working on.  (Some teams use multiple computers and it helps to know which computer an update came from)</LI>
+<input type="text" value="${host}" name="host"/>
+<LI>Upload the file to start the project with</LI>
+<input type="file" name="ev3file"/>
+<LI>After everything else is complete, press Create to make the project.</LI>
+<input type="submit" value="Create"/>
+</OL>
 </form>
