@@ -7,12 +7,17 @@
 <H1>Upload (Commit)</H1>
 	Please enter in all fields.   
 <br/>
-<table>
-<tr/>
-<tr><td>Comment:</td><td><input type="text" name="comment" size="60"/></td></tr>
-<tr><td>Programmer:</td><td><input type="text" value="${programmer}" name="who"/></td></tr>
-<tr><td>Host Computer:</td><td><input type="text" value="${host}" name="host"/></td></tr>
-<tr><td><input type="file" name="ev3file"/></td></tr>
-<tr><td><input type="submit" value="Upload"/></td></tr>
-</table>
+
+<OL>
+<LI>Enter a description of the changes that this upload(commit) has in it</LI>
+<input type="text" name="comment" size="60"/>
+<LI>Enter the name of the programmer that did the update</LI>
+<input type="text" value="${programmer}" name="who"/>
+<LI>Enter the name of the computer you are working on.  (Some teams use multiple computers and it helps to know which computer an update came from)</LI>
+<input type="text" value="${host}" name="host"/>
+<LI>Upload the file for the update</LI>
+<input type="file" name="ev3file"/>
+<LI>After everything else is complete, press Upload to finish.</LI>
+<input type="submit" value="Upload"/>
+</OL>
 </form>
