@@ -42,6 +42,56 @@ class Commit(object):
       return self.commitDetails["host"];
     def comment(self):
       return self.commitDetails["comment"];
+      
+    def get_EV3_data(self, projName, fullpath):
+        variables = {}
+        programs = []
+        myblockdefs = []
+        medias = []
+
+        ev3Contents = cStringIO.StringIO()
+        
+        ev3_template = Template(filename='HTMLTemplates/lvprojx.html');
+        
+        with zipfile.ZipFile(ev3Contents, "a", zipfile.ZIP_DEFLATED, False) as zf:
+            # so we can keep track of the commit this is from
+            zf.writestr("ev3hub.json", '{{"fromCommit": "{0}","project":"{1}"}}'.format(self.cid(), projName))
+            for filename in self.files():
+                if self.files()[filename] == "":
+                    varInfo = filename.split(':', 1);
+                    variables[varInfo[1]] = varInfo[0]
+                else:
+                    with open(fullpath + self.files()[filename], 'r') as file:
+                        zf.writestr(filename, file.read())    
+                    file_parts = filename.split('.',1);
+     
+                    basename = file_parts[0];
+                    ext = file_parts[-1];
+                    
+                    if ext.startswith('ev3p'):
+                        if ext == 'ev3p.mbxml':
+                            myblockdefs.append(basename + '.ev3p')
+                        else:
+                          programs.append(filename)
+                    elif ext in ['rgf', 'rsf', 'rtf']:
+                        medias.append(filename)
+
+            for myblock in myblockdefs:
+                programs.remove(myblock)
+                
+            # generate lvprojx.proj file here
+            lvprojx_data = ev3_template.render(programs= sorted(programs, key=unicode.lower), 
+                                               myblockdefs= sorted(myblockdefs, key=unicode.lower),
+                                               vars= variables,
+                                               medias= sorted(medias, key=unicode.lower),
+                                               daisychain= False,
+                                               strict_underfined=True)                
+            zf.writestr('Project.lvprojx', lvprojx_data)
+            
+            for zfile in zf.filelist:
+                zfile.create_system = 0
+            zf.close()
+        return ev3Contents.getvalue();
        
     def __str__(self):
       return "{0}:{1}".format(self.commit_id, self.commitDetails)
@@ -158,54 +208,7 @@ class EV3Project(object):
             return self.getEV3Data(Commit.from_id(cid, self.path))
             
     def getEV3Data(self, commit):
-        variables = {}
-        programs = []
-        myblockdefs = []
-        medias = []
-
-        ev3Contents = cStringIO.StringIO()
-        
-        ev3_template = Template(filename='HTMLTemplates/lvprojx.html');
-        
-        with zipfile.ZipFile(ev3Contents, "a", zipfile.ZIP_DEFLATED, False) as zf:
-            # so we can keep track of the commit this is from
-            zf.writestr("ev3hub.json", '{{"fromCommit": "{0}","project":"{1}"}}'.format(commit.cid(), self.name))
-            for filename in commit.files():
-                if commit.files()[filename] == "":
-                    varInfo = filename.split(':', 1);
-                    variables[varInfo[1]] = varInfo[0]
-                else:
-                    with open(self.fullpath("repo/" + commit.files()[filename]), 'r') as file:
-                        zf.writestr(filename, file.read())    
-                    file_parts = filename.split('.',1);
-     
-                    basename = file_parts[0];
-                    ext = file_parts[-1];
-                    
-                    if ext.startswith('ev3p'):
-                        if ext == 'ev3p.mbxml':
-                            myblockdefs.append(basename + '.ev3p')
-                        else:
-                          programs.append(filename)
-                    elif ext in ['rgf', 'rsf', 'rtf']:
-                        medias.append(filename)
-
-            for myblock in myblockdefs:
-                programs.remove(myblock)
-                
-            # generate lvprojx.proj file here
-            lvprojx_data = ev3_template.render(programs= sorted(programs, key=unicode.lower), 
-                                               myblockdefs= sorted(myblockdefs, key=unicode.lower),
-                                               vars= variables,
-                                               medias= sorted(medias, key=unicode.lower),
-                                               daisychain= False,
-                                               strict_underfined=True)                
-            zf.writestr('Project.lvprojx', lvprojx_data)
-            
-            for zfile in zf.filelist:
-                zfile.create_system = 0
-            zf.close()
-        return ev3Contents.getvalue();
+        return commit.get_EV3_data(self.name, self.fullpath("repo/"))
         
     def uploadCommit(self, ev3data, comment, who, host):
         files = {};
