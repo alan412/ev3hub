@@ -8,10 +8,10 @@ from ev3commit import Commit, Changeset
        
 class EV3Project(object):
     @classmethod
-    def newProject(cls, user, name, ev3data, who, host):
-        if os.path.exists(os.path.join(user, name)):
+    def newProject(cls, name, path, ev3data, who, host):
+        if os.path.exists(path):
           return None;
-        newP = cls(name, user);
+        newP = cls(name, path);
         data = {}
         data["head"] = 1;
         data["failedMerges"] = [];
@@ -23,10 +23,9 @@ class EV3Project(object):
     def fullpath(self, filename):
         return os.path.join(self.path, filename) 
     
-    def __init__(self, name, user):
+    def __init__(self, name, path):
         self.name = name;
-        self.user = user;   # not sure why I am saving this....
-        self.path = os.path.join('data', user, name)
+        self.path = path
         self.failedMerges = [];
         self.head = 1;
         
@@ -43,15 +42,16 @@ class EV3Project(object):
                    self.failedMerges = []
         except:
            pass   
+    
     def getCommit(self, cid):
-        return Commit.from_id(cid, self.path)
+        return Commit.from_id(self.path, cid)
         
     def getListOfCommits(self):
         commits = [];
         cid = 1;
 
         while(os.path.isfile(Commit.file_from_id(self.path, cid))):
-            commits.append(Commit.from_id(cid, self.path))
+            commits.append(Commit.from_id(self.path, cid))
             cid = cid + 1
         return sorted(commits, key=methodcaller('time'), reverse=True)                
                
@@ -65,49 +65,14 @@ class EV3Project(object):
         commit_id = cid;
         if cid == "head":
             commit_id = self.head;
-        return Commit.from_id(commit_id, self.path).get_EV3_data(self.name, self.fullpath("repo/"))
+
+        return Commit.from_id(self.path, commit_id).get_ev3_data(self.name)
         
     def uploadCommit(self, ev3data, comment, who, host):
-        files = {};
-        parent = 0;
-
-        in_memory_zip = cStringIO.StringIO(ev3data)
-        with zipfile.ZipFile(in_memory_zip, "r", zipfile.ZIP_DEFLATED, False) as zf:
-            for fileName in zf.namelist():
-                if zf.getinfo(fileName).file_size > 1024*1024*1024:  # don't allow larger than 1MB
-                    raise zipfile.BadZipfile 
-                if fileName == "ev3hub.json":
-                    with zf.open("ev3hub.json", 'r') as json_file:
-                        data = json.loads(json_file.read())
-                        if data["project"] == self.name:
-                           parent = data["fromCommit"]
-                elif fileName == "Project.lvprojx":
-                    with zf.open('Project.lvprojx', 'r') as project_file:
-                      new_projxml = ET.fromstring(project_file.read())
-                    for ns in new_projxml:
-                      if ns.attrib['Name'] == 'Default':
-                        for sns in ns[0]:
-                          if 'ProjectSettings' in sns.tag:
-                            for ssns in sns:
-                              if 'NamedGlobalData' in ssns.tag:
-                                for var in ssns:
-                                  files[var.attrib['Type'] + ':' + var.attrib['Name']] = ""
-                else:  
-                    contents = zf.read(fileName)
-                    m = hashlib.sha1()
-                    m.update(contents)
-                    files[fileName] = m.hexdigest()
-                    if not os.path.isfile(self.fullpath("repo/"+m.hexdigest())):
-                        data = zf.read(fileName)
-                        with open(self.fullpath("repo/"+m.hexdigest()), "wb") as outfile:
-                            outfile.write(data)
-        commit = {"parent" : parent, "mergedFrom" : 0, "time" : time.time(), "name" : who, "host" : host, "comment" : comment, "files" : files}
-        
         cid = self.findNextCommit();
-        with open(self.fullpath("{0}.json".format(cid)), "w") as outfile:
-            json.dump(commit, outfile) 
-        return cid;       
-    
+        commit = Commit.from_ev3file(self.path, cid, ev3data, comment, who, host, self.name);
+        return cid;
+
     def find_common_parent(self, commit1, commit2):
         parents1 = ["{0}".format(commit1.cid())]
         parents2 = ["{0}".format(commit2.cid())]
@@ -115,10 +80,10 @@ class EV3Project(object):
         while not set(parents1) & set(parents2):
 #            print "{0}:{1} - {2}.{3}".format(parents1, parents2,commit1.cid(),commit2.cid())
             if(commit1.parent()):
-                commit1 = Commit.from_id(commit1.parent(), self.path)
+                commit1 = Commit.from_id(self.path, commit1.parent())
                 parents1.append("{0}".format(commit1.cid()))
             if(commit2.parent()):
-                commit2 = Commit.from_id(commit2.parent(), self.path)
+                commit2 = Commit.from_id(self.path, commit2.parent())
                 parents2.append("{0}".format(commit2.cid())) 
             elif commit1.parent() == commit2.parent():   # in this case they are both 0
                 parents1.append("0");
@@ -132,12 +97,12 @@ class EV3Project(object):
         if not self.head:
             self.head = cid;
         else:    
-            head_commit = Commit.from_id(self.head, self.path)
-            id_commit = Commit.from_id(cid, self.path)
+            head_commit = Commit.from_id(self.path, self.head)
+            id_commit = Commit.from_id(self.path, cid)
             # find common parent
             parent_cid = self.find_common_parent(head_commit, id_commit)
 
-            parent_commit = Commit.from_id(parent_cid, self.path)
+            parent_commit = Commit.from_id(self.path, parent_cid)
             changes_to_head = Changeset(parent_commit, head_commit)
             changes_to_commit = Changeset(parent_commit, id_commit)                      
             proposed_head_commit = head_commit;
@@ -162,12 +127,10 @@ class EV3Project(object):
             
             if not errors:
                 new_id = self.findNextCommit();
-                newCommit = {"parent" : self.head, "mergedfrom" : cid, "time" : time.time(), "name" : "EV3Hub", "host" : "", "comment" : "Auto-merged from {0}".format(cid), 
-                             "files" : proposed_head_commit.files()}
-                cs = Changeset(Commit(new_id, newCommit), id_commit)             
+                new_commit = Commit.from_merge(self.path, self.head, new_id, cid, proposed_head_commit.files())
+                cs = Changeset(new_commit, id_commit)             
                 if cs.different():
-                    with open(self.fullpath("{0}.json".format(new_id)), "w") as outfile:
-                        json.dump(newCommit, outfile)
+                    new_commit.save()
                     data["head"] = new_id;
                     self.head = new_id;
                 else:
@@ -192,15 +155,15 @@ if __name__ == "__main__":
     commit_filename = args.file
     with open(commit_filename, 'r') as ev3File:
         ev3contents = ev3File.read()
-    ev3P = EV3Project("test", "user")
-    cid = ev3P.uploadCommit(ev3contents, args.comment, "author", "honeycrisp")
+    
+    ev3P = EV3Project("test", "testDir")
+    cid = ev3P.uploadCommit(ev3contents, "comment", "author", "honeycrisp")
+    
     merge_errors = ev3P.merge(cid)
     if merge_errors:
        print merge_errors
     else:
        print "Successful merge!"    
     
-    commit = Commit.from_id(ev3P.head, ev3P.path)
     with open("out.zip", "w") as outfile:
-       outfile.write(ev3P.getEV3Data(commit))
-
+       outfile.write(ev3P.download(ev3P.head))

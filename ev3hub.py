@@ -81,6 +81,10 @@ class EV3hub(object):
         
     def template(self, name, **kwargs):
         return self.lookup.get_template(name).render(**kwargs);
+        
+    def get_project_dir(self, username, project):
+        # This will change to not just using username plus project
+        return os.path.join("data", username, project)
           
     def show_loginpage(self, error=''):
         cherrypy.session.regenerate();      
@@ -93,7 +97,7 @@ class EV3hub(object):
         project = Cookie('project').get("")
         if not project:
             return self.projects()
-        ev3P = ev3project.EV3Project(project, username)
+        ev3P = ev3project.EV3Project(project, self.get_project_dir(username, project))
         commits = ev3P.getListOfCommits()
                    
         return self.template("mainpage.html", username = username, project = project, commits = commits, failedMerges = ev3P.failedMerges, head= ev3P.head, error=error)
@@ -152,7 +156,7 @@ class EV3hub(object):
            return self.show_changeprojectpage('Blank name for project')
         try:      
            ev3data = ev3file.file.read();
-           ev3P = ev3project.EV3Project.newProject(username, project, ev3data, who, host)
+           ev3P = ev3project.EV3Project.newProject(project, self.get_project_dir(username, project), ev3data, who, host)
            Cookie('project').set(project)
            Cookie('who').set(who)
            Cookie('host').set(host)
@@ -208,7 +212,8 @@ class EV3hub(object):
     @cherrypy.expose
     def download(self, cid):
         project = Cookie('project').get('')
-        ev3P = ev3project.EV3Project(project, Cookie('username').get(''))
+        username = Cookie('username').get('')
+        ev3P = ev3project.EV3Project(project, self.get_project_dir(username, project))
 
         if cid == 'head':
           filename = project + ".ev3"
@@ -227,7 +232,9 @@ class EV3hub(object):
            Cookie('host').set(host)
            Cookie('who').set(who)
            ev3data = ev3file.file.read();
-           ev3P = ev3project.EV3Project(Cookie('project').get(project), Cookie('username').get(''))
+           project = Cookie('project').get('')
+           username = Cookie('username').get('')
+           ev3P = ev3project.EV3Project(project, self.get_project_dir(username, project))
            cid = ev3P.uploadCommit(ev3data, comment, who, host)
            merge_errors = ev3P.merge(cid)
            if merge_errors:
@@ -245,8 +252,9 @@ class EV3hub(object):
         filelist = [];
         
         project = Cookie('project').get('')
+        username = Cookie('username').get('')
         
-        ev3P = ev3project.EV3Project(project, Cookie('username').get(''))
+        ev3P = ev3project.EV3Project(project, self.get_project_dir(username, project))
         commit1 = ev3P.getCommit(cid1)
         commit2 = ev3P.getCommit(cid2)
 
