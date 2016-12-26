@@ -13,7 +13,62 @@
     <br/><input type="password" name="password"  placeholder="Password" style="border:1px solid #333333; padding: 2px; margin:4px;"/>
     <br/><input type="submit" value="Login" action="login"/>
   </form>
-  <br/><br/><a href="createAccount">Create New Account</a>
+  
+  <br/><br/><button id="createBtn">Create Account</button>
   <br/>Later there will be functionality if you forgot your password, but it isn't implemented yet.  Sorry.
   </center>
   </td></tr></table>
+<script>
+  // Get the modal
+  var modal = document.getElementById('modal');
+
+  // Get the <span> element that closes the modal
+  var span = document.getElementsByClassName("close")[0];
+  
+  // Get the button that opens the modal
+  var createAccountBtn = document.getElementById("createBtn");
+  
+  // When the user clicks on the button, open the modal 
+  createAccountBtn.onclick = function() {
+  	$("#modal-header").html("Create Account");
+
+  	$("#modal-body").html("Your email will only be used if you forget your password to send you a reset link"+
+		"<p>The only characters allowed in user names are: letters, numbers, spaces, periods, dashes, underscores, and parenthesis. Any other characters will be removed</p>"+
+		"<table>"+
+		'<tr><td>Login:</td><td><input type="text" name="username" placeholder="Login Name"/></td></tr>'+
+		'<tr><td>Email:</td><td><input type="text" name="email" placeholder="email"/></td></tr>'+
+		'<tr><td>Password:</td><td><input type="password" name="password"  placeholder="password" /></td></tr>'+
+		'<tr><td>Repeat:</td><td><input type="password" name="password2"  placeholder="password" /></td></tr>'+
+		'</table>'+
+		'<input type="submit" onclick="createAccount()" value="Create"/>'
+	);
+    modal.style.display = "block";
+  }  
+  function createAccount(){
+	  var username_val = $("input[name=username]").val();
+  	  var email_val = $("input[name=email]").val();
+  	  var newpw1_val = $("input[name=password]").val();
+  	  var newpw2_val = $("input[name=password2]").val();
+ 			
+  	$.post("createUser", {email: email_val, password : newpw1_val, password2 : newpw2_val, username : username_val}, function(result){
+  		if (!$.trim(result)){   
+  		    modal.style.display = "none"; // everything is good :-)
+  		}
+  		else{   
+  		    alert("Result: " + result);
+  		}
+  	});
+  }
+
+  // When the user clicks on <span> (x), close the modal
+  span.onclick = function() {
+      modal.style.display = "none";
+  }
+
+  // When the user clicks anywhere outside of the modal, close it
+  window.onclick = function(event) {
+      if (event.target == modal) {
+          modal.style.display = "none";
+      }
+  }
+</script>

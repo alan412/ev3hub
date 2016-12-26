@@ -117,14 +117,6 @@ class EV3hub(object):
                    
         return self.template("mainpage.html", username = username, email = email, project = project, commits = commits, failedMerges = ev3P.failedMerges, head= ev3P.head, error=error)
         
-    def show_createaccountpage(self, error=''):
-        return self.template("createAccount.html", error = error)
-    
-    def show_settingspage(self, error=''):
-        username = Cookie('username').get()
-        ########### needs work to actually show email!!!       
-        return self.template("settings.html", username = username, email = 'dummy')
-    
     def show_uploadpage(self, project, username, programmer, host):
         return self.template("upload.html", project = project, username = username, programmer = programmer, host = host)
         
@@ -194,10 +186,6 @@ class EV3hub(object):
             return self.show_loginpage("Username and password don't match")
     
     @cherrypy.expose
-    def createAccount(self):
-        return self.show_createaccountpage('')
-        
-    @cherrypy.expose
     def createUser(self, username, email, password, password2):
         error = ''
         username = sanitize(username.lower())
@@ -207,10 +195,7 @@ class EV3hub(object):
             error = "Username in use!"
         else:
             self.users.add(username, email, password);
-        if error:
-            return self.show_createaccountpage(error);
-        
-        return self.show_loginpage('')
+        return error;
     
     @cherrypy.expose
     def logout(self):
