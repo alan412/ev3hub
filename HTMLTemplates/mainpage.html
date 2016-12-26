@@ -6,7 +6,6 @@
 <%inherit file="base.html"/>
 
 
-<div id="wrapper">
 <H1 class="project"><A HREF="projects">Project: ${project}</A></H1>
 <div class="dropdown">
   <button class="dropbtn">Logged in: ${username}</button>
@@ -22,17 +21,7 @@
 </TR>
 </TABLE>
 <button id="diffBtn">Show Diff</button>
-<div id="modal" class="modal">
-	<div class="modal-content">
-		<div class="modal-header">
-		   <span class="close">&times;</span>
-		   <h2 id="modal-header"></h2>
-		</div>
-		<div id="modal-body" class="modal-body">
-			<p>difference table would go here</p>
-		</div>
-	</div>
-</div>
+
 
 <TABLE class="commits" width="100%" border="1">
 <TR><TH>1</TH><TH>2</TH><TH>id</TH><TH>parent</TH><TH>Comments</TH><TH>Time</TH><TH>Who</TH><TH>Host</TH></TR>
@@ -58,16 +47,15 @@
 			<TD class="commits">${commit.host()}</TD> </TR>
 	% endfor
 </TABLE>	
-</div>
 <script>
 // Get the modal
 var modal = document.getElementById('modal');
 
-// Get the button that opens the modal
-var diffBtn = document.getElementById("diffBtn");
-
 // Get the <span> element that closes the modal
 var span = document.getElementsByClassName("close")[0];
+
+// Get the button that opens the modal
+var diffBtn = document.getElementById("diffBtn");
 
 var settings = document.getElementById("settings");
 var logout = document.getElementById("logout");
