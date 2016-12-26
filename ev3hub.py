@@ -53,21 +53,35 @@ class Users(object):
         except:
             pass
 
+    def save(self):
+        with open(self.path, 'w') as user_file:
+               json.dump(self.users, user_file)
+        
 # if username already exists, this overwrites it.   So be careful upon calling it!
     def add(self, username, email, password):
         self.users[username] = {}
         self.users[username]['password'] = pwd_context.hash(password)
         self.users[username]['email'] = email;
-
-        with open(self.path, 'w') as user_file:
-               json.dump(self.users, user_file)
-
+        self.save();
+    def change_password(self, username, newpass):
+        self.users[username]['password'] = pwd_context.hash(newpass)
+        self.save();
+    def change_email(self, username, email):
+        if email and (email != self.users[username]['email']):
+            self.users[username]['email'] = email
+            self.save();
     def get(self, username):
         try:
             result = self.users[username];
         except:
             result = ''        
-        return result;        
+        return result; 
+    def get_email(self, username):
+        try:
+            result = self.users[username]['email'];
+        except:
+            result = ''
+        return result;
     def verifyPassword(self, username,password):
         if self.get(username) == '':
             return False;
@@ -99,11 +113,17 @@ class EV3hub(object):
             return self.projects()
         ev3P = ev3project.EV3Project(project, self.get_project_dir(username, project))
         commits = ev3P.getListOfCommits()
+        email = self.users.get_email(username)
                    
-        return self.template("mainpage.html", username = username, project = project, commits = commits, failedMerges = ev3P.failedMerges, head= ev3P.head, error=error)
+        return self.template("mainpage.html", username = username, email = email, project = project, commits = commits, failedMerges = ev3P.failedMerges, head= ev3P.head, error=error)
         
     def show_createaccountpage(self, error=''):
         return self.template("createAccount.html", error = error)
+    
+    def show_settingspage(self, error=''):
+        username = Cookie('username').get()
+        ########### needs work to actually show email!!!       
+        return self.template("settings.html", username = username, email = 'dummy')
     
     def show_uploadpage(self, project, username, programmer, host):
         return self.template("upload.html", project = project, username = username, programmer = programmer, host = host)
@@ -210,6 +230,19 @@ class EV3hub(object):
         else: 
            return self.projects()    
     @cherrypy.expose
+    def updateSettings(self, email, newpw1, newpw2, password):
+        username = Cookie('username').get('')
+        if self.users.verifyPassword(username, password):
+           if newpw1 == newpw2:
+               if newpw1:
+                   self.users.change_password(username, newpw1)
+           else:
+               return "new passwords don't match"             
+           self.users.change_email(username, email)  
+        else:
+           return 'Password was incorrect'    
+
+    @cherrypy.expose
     def download(self, cid):
         project = Cookie('project').get('')
         username = Cookie('username').get('')
@@ -224,7 +257,10 @@ class EV3hub(object):
         cherrypy.response.headers['Content-Disposition'] = 'attachment; filename="{0}"'.format(filename)
         print cherrypy.response.headers
         return ev3P.download(cid)
-            
+    @cherrypy.expose
+    def settings(self):
+        return self.show_settingspage()
+                
     @cherrypy.expose
     def uploadDone(self, project, comment, who, host, ev3file):  
         error = '' 

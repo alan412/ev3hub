@@ -7,10 +7,14 @@
 
 
 <div id="wrapper">
-<H3 align=right>Logged in as ${username}. <A HREF="logout">logout</A></H3>
-<TABLE align="center">
-<TD><H1 align=right><A HREF="projects">Project: ${project}</A></H1></TD>
-</TABLE>
+<H1 class="project"><A HREF="projects">Project: ${project}</A></H1>
+<div class="dropdown">
+  <button class="dropbtn">Logged in: ${username}</button>
+  <div class="dropdown-content">
+	<p id="settings">Account Settings</p>
+    <p id="logout">Logout</p>
+  </div>
+</div>	
 
 <TABLE class=spacing width="100%">
 <TR><TD align="center"><H1><A HREF="download?cid=head">Download</A></H1></TD>
@@ -18,13 +22,13 @@
 </TR>
 </TABLE>
 <button id="diffBtn">Show Diff</button>
-<div id="diffModal" class="modal">
+<div id="modal" class="modal">
 	<div class="modal-content">
 		<div class="modal-header">
 		   <span class="close">&times;</span>
-		   <h2>Diff - ${project}</h2>
+		   <h2 id="modal-header"></h2>
 		</div>
-		<div id="diff" class="modal-body">
+		<div id="modal-body" class="modal-body">
 			<p>difference table would go here</p>
 		</div>
 	</div>
@@ -57,23 +61,67 @@
 </div>
 <script>
 // Get the modal
-var modal = document.getElementById('diffModal');
+var modal = document.getElementById('modal');
 
 // Get the button that opens the modal
-var btn = document.getElementById("diffBtn");
+var diffBtn = document.getElementById("diffBtn");
 
 // Get the <span> element that closes the modal
 var span = document.getElementsByClassName("close")[0];
 
+var settings = document.getElementById("settings");
+var logout = document.getElementById("logout");
+
 // When the user clicks on the button, open the modal 
-btn.onclick = function() {
+diffBtn.onclick = function() {
+	$("#modal-header").html("Diff - ${project}");
+	
 	var cid1_val = $("input[name=cid1]:checked").val();
 	var cid2_val = $("input[name=cid2]:checked").val();
 
 	$.post("diff", {cid1: cid1_val, cid2:cid2_val}, function(result){
-		$("#diff").html(result);
+		$("#modal-body").html(result);
 	} );
     modal.style.display = "block";
+}
+
+logout.onclick = function(){
+	window.location.assign("logout")
+}
+var email_start_val = "${email}";
+
+// When the user clicks on settings, open modal
+settings.onclick = function(){
+	$("#modal-header").html("Account Settings - ${username}");
+	$("#modal-body").html("<P>Only fill in the new password fields if you wish to change your password</P>" +
+"<table>"+
+'<tr><td>Email:</td><td><input type="text" name="email" value="'+email_start_val+'"/></td></tr>'+
+'<tr><td>New Password:</td><td><input type="password" name="newPassword"  placeholder="new password" /></td></tr>'+
+'<tr><td>New Password (again):</td><td><input type="password" name="newPassword2"  placeholder="new password" /></td></tr>'+
+'<tr><td>Current Password:</td><td><input type="password" name="password" placeholder="current password"></td></tr>'+
+"</table>"+
+'<br/><input type="submit" onclick="updateSettings()" value="Update"/>'		
+	);
+	modal.style.display = "block";
+}
+
+function updateSettings(){
+	var email_val = $("input[name=email]").val();
+	var newpw1_val = $("input[name=newPassword]").val();
+	var newpw2_val = $("input[name=newPassword2]").val();
+	var pw_val = $("input[name=password]").val();
+			
+	$.post("updateSettings", {email: email_val, newpw1 : newpw1_val, newpw2 : newpw2_val, password : pw_val}, function(result){
+		if (!$.trim(result)){   
+		    modal.style.display = "none"; // everything is good :-)
+			if(email_val){
+				email_start_val = email_val;
+			}
+		}
+		else{   
+		    alert("Result: " + result);
+		}
+	});
 }
 
 // When the user clicks on <span> (x), close the modal
