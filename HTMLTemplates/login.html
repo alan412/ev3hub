@@ -4,19 +4,22 @@
 
 <br/>
 <table width="100%">
-  <tr><td width="35%"><center>
+  <tr><td width="50%"><center>
   <img src='/static/splash.svg' width="450px">
-  </center></td><td><center>
-<h3>Login to EV3HUB</h3>
+</center></td><td>
+  <br/><br/>
+<h3>Login to EV3HUB </h3>
+<table><tr>
+<td>
+  <br/>
   <form method="post" action="login">   
     <input type="text" name="username" placeholder="Login Name" style="border:1px solid #333333; padding: 2px; margin:4px;"/>
     <br/><input type="password" name="password"  placeholder="Password" style="border:1px solid #333333; padding: 2px; margin:4px;"/>
     <br/><input type="submit" value="Login" action="login"/>
   </form>
-  
-  <br/><br/><button id="createBtn">Create Account</button>
-  <br/>Later there will be functionality if you forgot your password, but it isn't implemented yet.  Sorry.
-  </center>
+</td>
+<td style="vertical-align:center"><H1>OR <button id="createBtn">Create Account</button></H1></td></tr></table>
+  <br/><br/><button id="forgotBtn">Forgot Password</button>
   </td></tr></table>
 <script>
   // Get the modal
@@ -44,6 +47,30 @@
 	);
     modal.style.display = "block";
   }  
+  var forgottenBtn = document.getElementById("forgotBtn")
+  
+  forgottenBtn.onclick = function(){
+    	$("#modal-header").html("Forgot Password");	
+	  	$("#modal-body").html('<p>Enter in your login id.   A reset password link will be emailed to the email with the login.</p>'+
+							  'Login:<input type="text" name="username" placeholder="Login Name"/>'+
+							  '<br/><input type="submit" onclick="forgotPassword()" value="Forgot Password"/>'
+		);
+		modal.style.display = "block";
+  }
+  
+  function forgotPassword(){
+    	var username_val = $("input[name=username]").val();
+
+	  	$.post("forgotPass", {username : username_val}, function(result){
+	  		if (!$.trim(result)){   
+	  		    modal.style.display = "none"; // everything is good :-)
+	  		}
+	  		else{   
+	  		    alert(result);
+	  		}
+	  	});
+  }
+  
   function createAccount(){
 	  var username_val = $("input[name=username]").val();
   	  var email_val = $("input[name=email]").val();

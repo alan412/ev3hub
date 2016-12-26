@@ -196,7 +196,16 @@ class EV3hub(object):
         else:
             self.users.add(username, email, password);
         return error;
-    
+        
+    @cherrypy.expose
+    def forgotPass(self, username):
+        error = ''
+        if not self.users.get(username):
+            error = "Login doesn't exist"
+        else:
+            error = "Forgotten password not implemented yet"
+        return error;
+        
     @cherrypy.expose
     def logout(self):
         cherrypy.lib.sessions.expire()
