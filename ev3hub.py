@@ -6,13 +6,9 @@ import string
 import time
 from mako.template import Template
 from mako.lookup import TemplateLookup
-from passlib.apps import custom_app_context as pwd_context
 import argparse
-import smtplib
-import email.utils
-import random
-from email.mime.text import MIMEText
 from operator import itemgetter
+from users import Users
 
 # this is for Mike Spradling who found the bug which let him
 # violate the system.
@@ -47,69 +43,6 @@ class Cookie(object):
         cherrypy.session.pop(self.name, None)
         self.set('', 0)  # Way to delete a cookie is to set it with an expiration time of immediate
 
-class Users(object):
-    def __init__(self):
-        self.users = {};
-        if not os.path.exists('data'):
-            os.makedirs('data')
-        self.path = os.path.join('data','users.json')
-        try:
-            with open(self.path, 'r') as user_file:
-                self.users = json.loads(user_file.read())         
-        except:
-            pass
-    def create_forgotToken(self, username):
-        chars='ABCDEFGHJKMNPQRSTUVWXYZ23456789';
-        forgotID = ''.join(random.SystemRandom().choice(chars) for _ in range(8))
-        try:
-            self.users[username]['forgot'] = pwd_context.hash(forgotID)
-            self.save()
-        except:
-            forgotID = ''
-        return forgotID 
-    def verifyForgot(self, username, forgot):
-        try:
-            if pwd_context.verify(forgot, self.users[username]['forgot']):
-                self.users[username]['forgot'] = ''   # Don't save because the next step is changing password
-                return True;       
-        except:
-            pass
-        return False
-    def save(self):
-        with open(self.path, 'w') as user_file:
-               json.dump(self.users, user_file)
-        
-# if username already exists, this overwrites it.   So be careful upon calling it!
-    def add(self, username, email, password):
-        self.users[username] = {}
-        self.users[username]['password'] = pwd_context.hash(password)
-        self.users[username]['email'] = email;
-        self.save();
-    def change_password(self, username, newpass):
-        self.users[username]['password'] = pwd_context.hash(newpass)
-        self.save();
-    def change_email(self, username, email):
-        if email and (email != self.users[username]['email']):
-            self.users[username]['email'] = email
-            self.save();
-    def get(self, username):
-        try:
-            result = self.users[username];
-        except:
-            result = ''        
-        return result; 
-    def get_email(self, username):
-        try:
-            result = self.users[username]['email'];
-        except:
-            result = ''
-        return result;
-    def verifyPassword(self, username,password):
-        if self.get(username) == '':
-            return False;
-        else:
-            return pwd_context.verify(password, self.users[username]['password'])
-    
 class EV3hub(object):  
     def __init__(self):
         self.users = Users();
@@ -117,10 +50,11 @@ class EV3hub(object):
         
     def template(self, name, **kwargs):
         return self.lookup.get_template(name).render(**kwargs);
-        
-    def get_project_dir(self, username, project):
-        # This will change to not just using username plus project
-        return os.path.join("data", username, project)
+    
+    def get_project(self):
+        project = Cookie('project').get('')
+        username = Cookie('username').get('')
+        return ev3project.EV3Project(project, self.users.get_project_dir(username, project))
           
     def show_loginpage(self, error=''):
         cherrypy.session.regenerate();      
@@ -136,7 +70,7 @@ class EV3hub(object):
         project = Cookie('project').get("")
         if not project:
             return self.projects()
-        ev3P = ev3project.EV3Project(project, self.get_project_dir(username, project))
+        ev3P = self.get_project()
         commits = ev3P.getListOfCommits()
         email = self.users.get_email(username)
                    
@@ -152,29 +86,8 @@ class EV3hub(object):
         if not username:
             return self.show_loginpage('')
             
-        return self.template("projects.html",projects=self.get_projectlist(username),host=host,username=username,programmer=programmer,error=error)
-        
-    def get_projectlist(self, username):
-        projects = [];
-        path = os.path.join('data', username);
-        if os.path.exists(path):
-           projects = next(os.walk(path))[1]
-
-        projects_dates = [];
-        if projects:
-            for project in projects:
-                updated = time.localtime(os.path.getmtime(os.path.join('data', username, project)));
-                projects_dates.append({'name':project, 'UpdatedStr': time.strftime("%a %b %d, %Y", updated), 'Updated': updated })
-
-        return sorted(projects_dates, key=itemgetter('Updated'), reverse=True)
-    
-    def project_exists(self, username, project):
-        path = self.get_project_dir(username, project)
-        if os.path.exists(path):
-            return True
-        else:
-            return False
-                
+        return self.template("projects.html",projects=self.users.get_projectlist(username),host=host,username=username,programmer=programmer,error=error)
+                    
     @cherrypy.expose
     def index(self):
         username = Cookie('username').get()
@@ -191,7 +104,7 @@ class EV3hub(object):
         username = Cookie('username').get()
         if not username:
             return self.show_loginpage('')
-        if self.project_exists(username, project):
+        if self.users.project_exists(username, project):
             Cookie('project').set(project)
             return self.show_mainpage(username)
         else:
@@ -203,13 +116,13 @@ class EV3hub(object):
         username = Cookie('username').get()
         if not username:
            return self.show_loginpage('')       
-        if self.project_exists(username, project):
+        if self.users.project_exists(username, project):
            return self.show_changeprojectpage('Duplicate Project')
         if not project:   # if blank
            return self.show_changeprojectpage('Blank name for project')
         try:      
            ev3data = ev3file.file.read();
-           ev3P = ev3project.EV3Project.newProject(project, self.get_project_dir(username, project), ev3data, who, host)
+           ev3P = ev3project.EV3Project.newProject(project, self.users.get_project_dir(username, project), ev3data, who, host)
            Cookie('project').set(project)
            Cookie('who').set(who)
            Cookie('host').set(host)
@@ -220,7 +133,7 @@ class EV3hub(object):
     @cherrypy.expose
     def login(self,username=None,password=None):
         username = username.lower()
-        if self.users.verifyPassword(username, password):
+        if self.users.verify_password(username, password):
             Cookie('username').set(username)
             return self.show_mainpage(username);
         else:
@@ -240,16 +153,7 @@ class EV3hub(object):
         
     @cherrypy.expose
     def forgotPass(self, username):
-        error = ''
-        if not self.users.get(username):
-            error = "Login doesn't exist"
-        else:
-            email = self.users.get_email(username);
-            if email:
-               token = self.users.create_forgotToken(username);    
-               self.mailToken(username, token, self.users.get_email(username));   
-            else:
-               error = "No email defined for user:{0}".format(username) 
+        error = self.users.mail_token(username)
         return error;
 
     @cherrypy.expose
@@ -258,7 +162,7 @@ class EV3hub(object):
 
     @cherrypy.expose
     def resetPassword(self, username, token, newpw1, newpw2):
-        if self.users.verifyForgot(username, token):
+        if self.users.verify_forgot(username, token):
             if newpw1 == newpw2:
                 if newpw1:
                     self.users.change_password(username, newpw1)
@@ -289,7 +193,7 @@ class EV3hub(object):
     @cherrypy.expose
     def updateSettings(self, email, newpw1, newpw2, password):
         username = Cookie('username').get('')
-        if self.users.verifyPassword(username, password):
+        if self.users.verify_password(username, password):
            if newpw1 == newpw2:
                if newpw1:
                    self.users.change_password(username, newpw1)
@@ -303,7 +207,7 @@ class EV3hub(object):
     def download(self, cid):
         project = Cookie('project').get('')
         username = Cookie('username').get('')
-        ev3P = ev3project.EV3Project(project, self.get_project_dir(username, project))
+        ev3P = ev3project.EV3Project(project, self.users.get_project_dir(username, project))
 
         if cid == 'head':
           filename = project + ".ev3"
@@ -326,14 +230,14 @@ class EV3hub(object):
            Cookie('host').set(host)
            Cookie('who').set(who)
            ev3data = ev3file.file.read();
-           project = Cookie('project').get('')
-           username = Cookie('username').get('')
-           ev3P = ev3project.EV3Project(project, self.get_project_dir(username, project))
+
+           ev3P = self.get_project()
            cid = ev3P.uploadCommit(ev3data, comment, who, host)
            merge_errors = ev3P.merge(cid)
            if merge_errors:
               error = merge_errors            
         except:
+            raise
             error = 'Error in uploading.  Upload not saved'
          
         username = Cookie('username').get('')
@@ -344,11 +248,8 @@ class EV3hub(object):
         error = ''
         files = []
         filelist = [];
-        
-        project = Cookie('project').get('')
-        username = Cookie('username').get('')
-        
-        ev3P = ev3project.EV3Project(project, self.get_project_dir(username, project))
+            
+        ev3P = self.get_project()
         commit1 = ev3P.getCommit(cid1)
         commit2 = ev3P.getCommit(cid2)
 
@@ -370,24 +271,8 @@ class EV3hub(object):
                     sha2 = 'var'
             files.append({'name' : filename, '1' : sha1, '2' : sha2})
             
-        return self.show_diffpage(project,commit1, commit2, files)       
-    def mailToken(self, username, token, mail):
-       msg = MIMEText("Please go to http://beta.ev3hub.com/forgot?username=" + username + 
-           "&token=" + token + " to reset your password.  If you did not request that you had forgotten " +
-           "your password, then you can safely ignore this e-mail.\n\nThank you,\nthe EV3HUB team");          
-    
-       from_email = 'ev3hub@ev3hub.com';
-       msg['To'] = email.utils.formataddr((username, mail))
-       msg['From'] = email.utils.formataddr(('EV3Hub Admin', from_email))
-       msg['Subject'] = 'Forgotten Password'
- 
-       server = smtplib.SMTP('localhost')       
-       try:
-          server.sendmail(from_email, [mail], msg.as_string())
-          #print "Simulating sending: {0}, {1},{2}".format(from_email, mail, msg.as_string())
-       finally:
-          server.quit()
-          pass
+        return self.show_diffpage(ev3P.name,commit1, commit2, files)       
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Version Control for ev3")
