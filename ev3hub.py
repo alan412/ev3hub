@@ -167,7 +167,14 @@ class EV3hub(object):
                 projects_dates.append({'name':project, 'UpdatedStr': time.strftime("%a %b %d, %Y", updated), 'Updated': updated })
 
         return sorted(projects_dates, key=itemgetter('Updated'), reverse=True)
-        
+    
+    def project_exists(self, username, project):
+        path = self.get_project_dir(username, project)
+        if os.path.exists(path):
+            return True
+        else:
+            return False
+                
     @cherrypy.expose
     def index(self):
         username = Cookie('username').get()
@@ -184,10 +191,11 @@ class EV3hub(object):
         username = Cookie('username').get()
         if not username:
             return self.show_loginpage('')
-        if not project in self.get_projectlist(username):
+        if self.project_exists(username, project):
+            Cookie('project').set(project)
+            return self.show_mainpage(username)
+        else:
             return self.show_changeprojectpage('Please select an existing project')
-        Cookie('project').set(project)
-        return self.show_mainpage(username)
                 
     @cherrypy.expose
     def newProject(self, project, who, host, ev3file):
@@ -195,7 +203,7 @@ class EV3hub(object):
         username = Cookie('username').get()
         if not username:
            return self.show_loginpage('')       
-        if project in self.get_projectlist(username):
+        if self.project_exists(username, project):
            return self.show_changeprojectpage('Duplicate Project')
         if not project:   # if blank
            return self.show_changeprojectpage('Blank name for project')
