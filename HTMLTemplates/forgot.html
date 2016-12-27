@@ -1,0 +1,29 @@
+<%def name="title()">EV3Hub: Reset Password</%def>
+<%def name="scripts()"/>
+<%inherit file="base.html"/>
+
+<H1>New password for ${username}</H1>
+
+<table>
+<tr><td>New Password:</td><td><input type="password" name="newPassword"  placeholder="password" /></td></tr>
+<tr><td>Repeat:</td><td><input type="password" name="newPassword2"  placeholder="password" /></td></tr>
+</table>
+<input type="submit" onclick="changePassword()" value="Change Password"/>
+
+<script>
+ function changePassword(){
+ 	var newpw1_val = $("input[name=newPassword]").val();
+ 	var newpw2_val = $("input[name=newPassword2]").val();
+	var user_val = "${username}";
+	var token_val = "${token}";
+ 				
+ 	$.post("resetPassword", {username: user_val, token: token_val, newpw1 : newpw1_val, newpw2 : newpw2_val}, function(result){
+ 		if (!$.trim(result)){   
+ 		    window.location.assign("/")
+ 		}
+ 		else{   
+ 		    alert(result);
+ 		}
+ 	});
+ }
+</script>

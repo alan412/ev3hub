@@ -7,6 +7,10 @@ from mako.template import Template
 from mako.lookup import TemplateLookup
 from passlib.apps import custom_app_context as pwd_context
 import argparse
+import smtplib
+import email.utils
+import random
+from email.mime.text import MIMEText
 
 # this is for Mike Spradling who found the bug which let him
 # violate the system.
@@ -52,7 +56,23 @@ class Users(object):
                 self.users = json.loads(user_file.read())         
         except:
             pass
-
+    def create_forgotToken(self, username):
+        chars='ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+        forgotID = ''.join(random.SystemRandom().choice(chars) for _ in range(8))
+        try:
+            self.users[username]['forgot'] = pwd_context.hash(forgotID)
+            self.save()
+        except:
+            forgotID = ''
+        return forgotID 
+    def verifyForgot(self, username, forgot):
+        try:
+            if pwd_context.verify(forgot, self.users[username]['forgot']):
+                self.users[username]['forgot'] = ''   # Don't save because the next step is changing password
+                return True;       
+        except:
+            pass
+        return False
     def save(self):
         with open(self.path, 'w') as user_file:
                json.dump(self.users, user_file)
@@ -104,6 +124,9 @@ class EV3hub(object):
         cherrypy.session.regenerate();      
         return self.template("login.html", error = error)
     
+    def show_forgotpage(self, username, token, error=''):
+        return self.template("forgot.html", username = username, token = token, error = error)
+        
     def show_diffpage(self, project, commit1, commit2, files, error=''):
         return self.template("diff.html", project=project, commit1 = commit1, commit2 = commit2, files = files, error = error)
     
@@ -203,9 +226,31 @@ class EV3hub(object):
         if not self.users.get(username):
             error = "Login doesn't exist"
         else:
-            error = "Forgotten password not implemented yet"
+            email = self.users.get_email(username);
+            if email:
+               token = self.users.create_forgotToken(username);    
+               self.mailToken(username, token, self.users.get_email(username));   
+            else:
+               error = "No email defined for user:{0}".format(username) 
         return error;
-        
+
+    @cherrypy.expose
+    def forgot(self, username, token):
+        return self.show_forgotpage(username, token)
+
+    @cherrypy.expose
+    def resetPassword(self, username, token, newpw1, newpw2):
+        if self.users.verifyForgot(username, token):
+            if newpw1 == newpw2:
+                if newpw1:
+                    self.users.change_password(username, newpw1)
+                    return ""
+                else:
+                    return "password can't be blank"
+            else:
+                return "new passwords don't match"
+        else:
+           return 'Invalid forgot username/token'            
     @cherrypy.expose
     def logout(self):
         cherrypy.lib.sessions.expire()
@@ -251,6 +296,7 @@ class EV3hub(object):
         cherrypy.response.headers['Content-Disposition'] = 'attachment; filename="{0}"'.format(filename)
         print cherrypy.response.headers
         return ev3P.download(cid)
+    
     @cherrypy.expose
     def settings(self):
         return self.show_settingspage()
@@ -307,6 +353,23 @@ class EV3hub(object):
             files.append({'name' : filename, '1' : sha1, '2' : sha2})
             
         return self.show_diffpage(project,commit1, commit2, files)       
+    def mailToken(self, username, token, mail):
+       msg = MIMEText("Please go to http://beta,ev3hub.com/forgot?username=" + username + 
+           "&token=" + token + " to reset your password");          
+    
+       from_email = 'ev3hub@ev3hub.com';
+       msg['To'] = mail;
+       msg['From'] = email.utils.formataddr(('EV3Hub Admin', from_email))
+       msg['Subject'] = 'Forgotten Password'
+ 
+       server = smtplib.SMTP('localhost')       
+       try:
+          server.sendmail(from_email, [mail], msg.as_string())
+          #print "Simulating sending: {0}, {1},{2}".format(from_email, mail, msg.as_string())
+       finally:
+          server.quit()
+          pass
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Version Control for ev3")
     parser.add_argument('conf')
