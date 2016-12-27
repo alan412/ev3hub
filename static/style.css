@@ -8,10 +8,17 @@
 }
 
 p.large{
-	background-color: green;
+	background-color: #4CAF50;
 	color: white;
 	cursor: pointer;
+	padding: 10px 20px;
+	border: 0;
 }
+p.large:hover{
+	background-color: green;
+	color: white;
+}
+
 /* Style The Dropdown Button */
 .dropbtn {
     background-color: #4CAF50;
