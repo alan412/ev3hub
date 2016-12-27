@@ -31,9 +31,10 @@ class Cookie(object):
     def get(self, default=''):
         result = default
         try:
-           result = cherrypy.session.get(self.name);
-	   if not result:
+           result = cherrypy.session.get(self.name)
+           if not result:
               self.set(default)
+              result = default
         except:
            self.set(default);
         return result;
@@ -271,7 +272,7 @@ class EV3hub(object):
                     sha2 = 'var'
             files.append({'name' : filename, '1' : sha1, '2' : sha2})
             
-        return self.show_diffpage(ev3P.name,commit1, commit2, files)       
+        return self.show_diffpage(ev3P.name, commit1, commit2, files)       
 
 
 if __name__ == '__main__':
