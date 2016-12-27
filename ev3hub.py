@@ -354,7 +354,7 @@ class EV3hub(object):
             
         return self.show_diffpage(project,commit1, commit2, files)       
     def mailToken(self, username, token, mail):
-       msg = MIMEText("Please go to http://beta,ev3hub.com/forgot?username=" + username + 
+       msg = MIMEText("Please go to http://beta.ev3hub.com/forgot?username=" + username + 
            "&token=" + token + " to reset your password");          
     
        from_email = 'ev3hub@ev3hub.com';
