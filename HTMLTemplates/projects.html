@@ -4,10 +4,10 @@
 <H3 align=right>Logged in as ${username}. <A HREF="logout">logout</A></H3>
 
 % if projects:
-<TABLE width="50%" border="1">
-<TR><TD>Select Project</TD></TR>
+<TABLE class='projects' width="100%" border="1">
+<TR><TH>Project Name</TH><TH>Last Changed</TH></TR>
 	% for project in projects:
-		<TR class=${loop.cycle('even', 'odd')}><TD><A HREF="changeProject?project=${project}">${project}</A></TD></TR>
+		<TR class='projects'}><TD><A HREF="changeProject?project=${project['name']}">${project['name']}</A></TD><TD>${project['UpdatedStr']}</TD></TR>
 	% endfor
 </TABLE>
 % else:

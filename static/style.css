@@ -60,6 +60,17 @@ h1.error{
 	color: white;
 }
 
+table.projects {
+    border-collapse: collapse;
+}
+
+table.projects, td.projects {
+    border-left-style: 1px solid black;
+    border-right-style: 1px solid black;
+}
+
+tr.projects:nth-child(even) {background-color: #f2f2f2}
+
 table.commits {
     border-collapse: collapse;
 }

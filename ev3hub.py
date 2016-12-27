@@ -3,6 +3,7 @@ import os
 import ev3project
 import json
 import string
+import time
 from mako.template import Template
 from mako.lookup import TemplateLookup
 from passlib.apps import custom_app_context as pwd_context
@@ -11,6 +12,7 @@ import smtplib
 import email.utils
 import random
 from email.mime.text import MIMEText
+from operator import itemgetter
 
 # this is for Mike Spradling who found the bug which let him
 # violate the system.
@@ -153,10 +155,18 @@ class EV3hub(object):
         return self.template("projects.html",projects=self.get_projectlist(username),host=host,username=username,programmer=programmer,error=error)
         
     def get_projectlist(self, username):
+        projects = [];
         path = os.path.join('data', username);
         if os.path.exists(path):
-           return next(os.walk(path))[1]
-        return [];
+           projects = next(os.walk(path))[1]
+
+        projects_dates = [];
+        if projects:
+            for project in projects:
+                updated = time.localtime(os.path.getmtime(os.path.join('data', username, project)));
+                projects_dates.append({'name':project, 'UpdatedStr': time.strftime("%a %b %d, %Y", updated), 'Updated': updated })
+
+        return sorted(projects_dates, key=itemgetter('Updated'), reverse=True)
         
     @cherrypy.expose
     def index(self):
