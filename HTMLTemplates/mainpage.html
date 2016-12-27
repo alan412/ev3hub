@@ -16,8 +16,9 @@
 </div>	
 
 <TABLE class=spacing width="100%">
-<TR><TD align="center"><H1><A HREF="download?cid=head">Download</A></H1></TD>
-<TD align="center"><H1><A HREF="upload">Upload (Commit)</A></H1></TD>
+<TR>
+<TD align="center"><H1><A HREF="download?cid=head">Download</A></H1></TD>
+<TD align="center"><P class="large" id="upload">Upload (Commit)</P></TD>
 </TR>
 </TABLE>
 <button id="diffBtn">Show Diff</button>
@@ -59,6 +60,17 @@ var diffBtn = document.getElementById("diffBtn");
 
 var settings = document.getElementById("settings");
 var logout = document.getElementById("logout");
+var upload = document.getElementById("upload");
+
+upload.onclick = function() {
+	$("#modal-header").html("Upload (Commit) - ${project}");
+	
+	$.get("upload", function(result){
+		$("#modal-body").html(result);
+	} );
+	
+    modal.style.display = "block";	
+}
 
 // When the user clicks on the button, open the modal 
 diffBtn.onclick = function() {
