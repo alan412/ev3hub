@@ -2,11 +2,16 @@
 
 </%def>
 
-<%def name="title()">EV3 Hub - ${project}</%def>
+<%def name="title()">EV3hub - ${project}</%def>
 <%inherit file="base.html"/>
 
-
-<H1 class="project"><A HREF="projects">Project: ${project}</A></H1>
+<div class="top">
+<div class="project">
+	<A HREF="projects" class="projbtn">Project: ${project}<A>
+</div>
+<div class="title">
+	<P class="title">EV3hub</P>
+</div>
 <div class="dropdown">
   <button class="dropbtn">Logged in: ${username}</button>
   <div class="dropdown-content">
@@ -14,6 +19,7 @@
     <p id="logout">Logout</p>
   </div>
 </div>	
+</div>
 
 <TABLE class=spacing width="100%">
 <TR>
@@ -39,7 +45,7 @@
   		    <TD class="commits"><input type="radio" name="cid1" value="${commit.cid()}" checked="checked"></TD> 
   			<TD class="commits"><input type="radio" name="cid2" value="${commit.cid()}" checked="checked"></TD>
 	   % else:
-	      <TR>
+	      <TR class="commits">
   		    <TD class="commits"><input type="radio" name="cid1" value="${commit.cid()}"></TD> 
   			<TD class="commits"><input type="radio" name="cid2" value="${commit.cid()}"></TD>
 	   % endif
