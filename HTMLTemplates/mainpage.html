@@ -2,23 +2,25 @@
 
 </%def>
 
-<%def name="title()">EV3hub - ${project}</%def>
+<%def name="title()">EV3Hub - ${project}</%def>
 <%inherit file="base.html"/>
 
 <div class="top">
-<div class="project">
-	<A HREF="projects" class="projbtn">Project: ${project}<A>
-</div>
-<div class="title">
-	<P class="title">EV3hub</P>
-</div>
-<div class="dropdown">
-  <button class="dropbtn">Logged in: ${username}</button>
-  <div class="dropdown-content">
-	<p id="settings">Account Settings</p>
-    <p id="logout">Logout</p>
-  </div>
-</div>	
+	<div class="project">
+	    <button id="projBtn" class="projbtn">Project: ${project}</button>
+	</div>
+	<div class="title">
+		<IMG class="logo" height=60px src="static/splash.png"/>
+		<P class="title">EV3Hub</P>
+		<IMG class="logo" height=60px src="static/splash.png"/>
+	</div>
+	<div class="dropdown">
+	  <button class="dropbtn">Logged in: ${username}</button>	  
+	  <div class="dropdown-content">
+		<p id="settings">Account Settings</p>
+	    <p id="logout">Logout</p>
+	  </div>
+	</div>	
 </div>
 
 <TABLE class=spacing width="100%">
@@ -71,6 +73,7 @@ var settings = document.getElementById("settings");
 var logout = document.getElementById("logout");
 var upload = document.getElementById("upload");
 var download = document.getElementById("download");
+var projectBtn = document.getElementById("projBtn")
 
 upload.onclick = function() {
 	$("#modal-header").html("Upload (Commit) - ${project}");
@@ -83,6 +86,10 @@ upload.onclick = function() {
 
 download.onclick = function(){
 	window.location = "download?cid=head"
+}
+
+projectBtn.onclick = function(){
+	window.location = "projects"
 }
 
 // When the user clicks on the button, open the modal 
