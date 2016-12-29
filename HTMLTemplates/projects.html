@@ -7,7 +7,7 @@
 <TABLE class='projects' width="100%" border="1">
 <TR><TH width="50%">Project Name</TH><TH>Last Changed</TH></TR>
 	% for project in projects:
-		<TR class='projects'}><TD><A HREF="changeProject?project=${project['name']}">${project['name']}</A></TD><TD>${project['UpdatedStr']}</TD></TR>
+		<TR class='projects'}><TD><A HREF="changeProject?project=${project['name']}">${project['name']}</A></TD><TD class="date">${project['Updated']}</TD></TR>
 	% endfor
 </TABLE>
 % else:

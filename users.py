@@ -84,8 +84,8 @@ class Users(object):
         projects_dates = [];
         if projects:
             for project in projects:
-                updated = time.localtime(os.path.getmtime(os.path.join('data', username, project)));
-                projects_dates.append({'name':project, 'UpdatedStr': time.strftime("%a %b %d, %Y %I:%M %p %Z", updated), 'Updated': updated })
+                updated = os.path.getmtime(os.path.join('data', username, project));
+                projects_dates.append({'name':project, 'Updated': updated })
 
         return sorted(projects_dates, key=itemgetter('Updated'), reverse=True)
     

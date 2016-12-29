@@ -18,7 +18,8 @@ $("#showSameBtn").click(function(){
 <CENTER><button id="showSameBtn">Hide ones that are the same</button></CENTER>
 
 <TABLE class="diff" width="80%">
-<TR><TH width="5%"></TH><TH width="45%">${commit1.cid()} -  ${commit1.timeStr()}</TH><TH width="45%">${commit2.cid()} - ${commit2.timeStr()}</TH></TR>
+<TR><TH width="5%"></TH><TH width="45%">${commit1.cid()} -  <span class="date">${commit1.time()}</span></TH>
+	<TH width="45%">${commit2.cid()} - <span class="date">${commit2.time()}</span></TH></TR>
 <TR><TH></TH><TH>${commit1.comment()}</TH><TH>${commit2.comment()}</TH></TR>
 % for file in files:
    % if file['1'] == file['2']:

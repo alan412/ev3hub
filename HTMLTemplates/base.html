@@ -2,6 +2,18 @@
 <!DOCTYPE html>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 ${self.scripts()}
+<script>
+function pythonDatetimeToHTML(datetime){
+	var js_datetime = new Date(datetime * 1000);
+	var options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName : 'short'}
+	return js_datetime.toLocaleString("en-US", options);
+}
+$( document ).ready(function(){
+	$(".date").each(function(){
+		$( this ).text(pythonDatetimeToHTML($(this).text()));
+	});	
+});
+</script>
 <html>
 	<head>
 		<link rel="stylesheet" type="text/css" href="static/style.css"/>

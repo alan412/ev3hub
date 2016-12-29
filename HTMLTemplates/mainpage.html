@@ -54,7 +54,7 @@
 			<TD class="commits"><A HREF="download?cid=${commit.cid()}">${commit.cid()}</TD></A> 
 			<TD class="commits">${commit.parent()}</TD>
 			<TD class="commits">${commit.comment()}</TD> 
-			<TD class="commits">${commit.timeStr()}</TD> 
+			<TD class="commits date">${commit.time()}</TD>
 			<TD class="commits">${commit.name()}</TD> 
 			<TD class="commits">${commit.host()}</TD> </TR>
 	% endfor
@@ -101,7 +101,11 @@ diffBtn.onclick = function() {
 
 	$.post("diff", {cid1: cid1_val, cid2:cid2_val}, function(result){
 		$("#modal-body").html(result);
+		$("#modal-body .date").each(function(){
+			$( this ).text(pythonDatetimeToHTML($(this).text()));		   	
+		});
 	} );
+	
     modal.style.display = "block";
 }
 
