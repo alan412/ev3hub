@@ -33,13 +33,14 @@
   
   // When the user clicks on the button, open the modal 
   createAccountBtn.onclick = function() {
+	$("#error").html = ''  
   	$("#modal-header").html("Create Account");
 
   	$("#modal-body").html("<P>The username is shared with your whole team (or group) so we recommend something like your FLL team number, i.e. FLL447</P>"+
 		"<P>Your email will only be used if you forget your password to send you a reset link</P>"+
 		"<p>The only characters allowed in user names are: letters, numbers, spaces, periods, dashes, underscores, and parenthesis. Any other characters will be removed</p>"+
 		"<table>"+
-		'<tr><td>Login:</td><td><input type="text" name="username" placeholder="Login Name"/></td></tr>'+
+		'<tr><td>Login (Team name):</td><td><input type="text" name="username" placeholder="Login Name"/></td></tr>'+
 		'<tr><td>Email:</td><td><input type="text" name="email" placeholder="email"/></td></tr>'+
 		'<tr><td>Password:</td><td><input type="password" name="password"  placeholder="password" /></td></tr>'+
 		'<tr><td>Repeat:</td><td><input type="password" name="password2"  placeholder="password" /></td></tr>'+
@@ -68,7 +69,7 @@
 	  		    modal.style.display = "none"; // everything is good :-)
 	  		}
 	  		else{   
-	  		    alert(result);
+	  		    alert("Error: " + result);
 	  		}
 	  	});
   }
@@ -80,11 +81,12 @@
   	  var newpw2_val = $("input[name=password2]").val();
  			
   	$.post("createUser", {email: email_val, password : newpw1_val, password2 : newpw2_val, username : username_val}, function(result){
-  		if (!$.trim(result)){   
-  		    modal.style.display = "none"; // everything is good :-)
+  		if (result.startsWith("Error:")){   
+  		    alert(result);
   		}
   		else{   
-  		    alert("Result: " + result);
+  		    $("#error").html(result);
+			modal.style.display = "none"; // everything is good :-)
   		}
   	});
   }

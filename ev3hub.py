@@ -145,11 +145,12 @@ class EV3hub(object):
         error = ''
         username = sanitize(username.lower())
         if password != password2:
-            error = "Password's don't match!"
+            error = "Error: Password's don't match!"
         elif self.users.get(username):
-            error = "Username in use!"
+            error = "Error: Username '{0}' already in use!".format(username)
         else:
             self.users.add(username, email, password);
+            error = "Account '{0}' created.".format(username)
         return error;
         
     @cherrypy.expose
@@ -238,7 +239,7 @@ class EV3hub(object):
            if merge_errors:
               error = merge_errors            
         except:
-            raise
+#            raise
             error = 'Error in uploading.  Upload not saved'
          
         username = Cookie('username').get('')
