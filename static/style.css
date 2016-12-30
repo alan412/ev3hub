@@ -101,6 +101,11 @@ table.projects, td.projects {
 
 tr.projects:nth-child(even) {background-color: #f2f2f2}
 
+tr.projects:hover{
+	background-color: #3E606F;
+	cursor: pointer;
+}
+
 table.commits {
     border-collapse: collapse;
 }

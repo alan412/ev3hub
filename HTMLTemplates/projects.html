@@ -8,7 +8,7 @@ Click on project to see that project or fill out the form for a new project.
 <TABLE class='projects' width="100%" border="1">
 <TR><TH width="50%">Project Name</TH><TH>Last Changed</TH></TR>
 	% for project in projects:
-		<TR class='projects'}><TD><A HREF="changeProject?project=${project['name']}">${project['name']}</A></TD><TD class="date">${project['Updated']}</TD></TR>
+		<TR class='projects' onclick="window.location = 'changeProject?project=${project['name']}'"}><TD>${project['name']}</TD><TD class="date">${project['Updated']}</TD></TR>
 	% endfor
 </TABLE>
 % else:
@@ -18,7 +18,6 @@ Click on project to see that project or fill out the form for a new project.
 <br/>
 <form method="post" action="newProject" enctype="multipart/form-data">
 <H1>New Project</H1>
-<br/>
 <OL>
 <LI>Enter the name of the new project.  Only characters allowed in project names are: letters, numbers, spaces, periods, dashes, underscores, and parenthesis. Any other characters will be removed</LI>
 <input type="text" value="" name="project"/>
