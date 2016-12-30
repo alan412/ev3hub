@@ -7,7 +7,7 @@
 
 <div class="top">
 	<div class="project">
-	    <button id="projBtn" class="projbtn">Project: ${project}</button>
+	    <button id="projBtn" class="button">Project: ${project}</button>
 	</div>
 	<div class="title">
 		<IMG class="logo" height=60px src="static/splash.png"/>
@@ -15,7 +15,7 @@
 		<IMG class="logo" height=60px src="static/splash.png"/>
 	</div>
 	<div class="dropdown">
-	  <button class="dropbtn">Logged in: ${username}</button>	  
+	  <button class="button">Logged in: ${username}</button>	  
 	  <div class="dropdown-content">
 		<p id="settings">Account Settings</p>
 	    <p id="logout">Logout</p>
@@ -26,13 +26,13 @@
 <TABLE class=spacing width="100%">
 <TR>
 <TD with="5%"/>
-<TD width="40%" align="center"><P class="large" id="download">&darr; Download &darr;</P></TD>
+<TD width="40%" align="center"><P class="button" id="download">&darr; Download &darr;</P></TD>
 <TD/>
-<TD width="40%" align="center"><P class="large" id="upload">&uarr; Upload (Commit) &uarr;</P></TD>
+<TD width="40%" align="center"><P class="button" id="upload">&uarr; Upload (Commit) &uarr;</P></TD>
 <TD with="5%"/>
 </TR>
 </TABLE>
-<button id="diffBtn">Show Diff</button>
+<button id="diffBtn" class="button">Show Diff</button>
 
 
 <TABLE class="commits" width="100%" border="1">
@@ -59,6 +59,9 @@
 			<TD class="commits">${commit.host()}</TD> </TR>
 	% endfor
 </TABLE>	
+<div class="help">
+	<button id="helpBtn" class="button">Help</button>
+</div>
 <script>
 // Get the modal
 var modal = document.getElementById('modal');
@@ -73,11 +76,20 @@ var settings = document.getElementById("settings");
 var logout = document.getElementById("logout");
 var upload = document.getElementById("upload");
 var download = document.getElementById("download");
-var projectBtn = document.getElementById("projBtn")
+var projectBtn = document.getElementById("projBtn");
+var helpBtn = document.getElementById("helpBtn");
+
+helpBtn.onclick = function(){
+	$("#modal-header").html("Help");
+	
+	$("#modal-body").html("<p>Help not available yet</p>"
+    
+	);
+    modal.style.display = "block";		
+}
 
 upload.onclick = function() {
 	$("#modal-header").html("Upload (Commit) - ${project}");
-	
 	$.get("upload", function(result){
 		$("#modal-body").html(result);
 	} );

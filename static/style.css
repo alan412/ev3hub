@@ -28,15 +28,14 @@ p.title{
 	vertical-align: middle;
 }
 
-.projbtn {
+.button {
     background-color: #4CAF50;
     color: white;
-    padding: 16px;
+    padding: 10px 20px;
     font-size: 16px;
     border: none;
 	border-radius: 15px;
-    cursor: pointer;
-	
+    cursor: pointer;	
 }
 .project {
     position: absolute;
@@ -44,32 +43,8 @@ p.title{
 	display: inline;
 }
 
-.projbtn:hover{
+.button:hover{
 	background-color: green;
-}
-
-p.large{
-	background-color: #4CAF50;
-	color: white;
-	cursor: pointer;
-	padding: 10px 20px;
-	border: 0;
-	border-radius: 15px;
-}
-p.large:hover{
-	background-color: green;
-	color: white;
-}
-
-/* Style The Dropdown Button */
-.dropbtn {
-    background-color: #4CAF50;
-    color: white;
-    padding: 16px;
-    font-size: 16px;
-    border: none;
-	border-radius: 15px;
-    cursor: pointer;
 }
 
 /* The container <div> - needed to position the dropdown content */
@@ -103,11 +78,6 @@ p.large:hover{
 /* Show the dropdown menu on hover */
 .dropdown:hover .dropdown-content {
     display: block;
-}
-
-/* Change the background color of the dropdown button when the dropdown content is shown */
-.dropdown:hover .dropbtn {
-    background-color: #3e8e41;
 }
 
 h1.error{
@@ -149,8 +119,8 @@ tr.commits:nth-child(even) {background-color: #f2f2f2}
 tr.notEquals {background-color: #880000; color: white;}
 tr.onlyOne {color: blue}
 tr.equals {color: gray}
-tr.failedMerge {background-color: tomato; color: white;}
-tr.head {background-color: silver;}
+tr.failedMerge {background-color: #F08080; color: white;}
+tr.head {background-color: #C0C0C0;}
 
 th {
     background-color: #4CAF50;
@@ -174,7 +144,7 @@ th {
 /* Modal Header */
 .modal-header {
     padding: 2px 16px;
-    background-color: #5cb85c;
+    background-color: green;
     color: white;
 }
 
@@ -190,6 +160,10 @@ th {
     border: 1px solid #888;
     width: 80%; /* Could be more or less, depending on screen size */
 	box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+}
+.help{
+	text-align: center;
+	padding: 10px;
 }
 
 /* The Close Button */
