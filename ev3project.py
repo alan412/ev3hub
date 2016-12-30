@@ -101,43 +101,45 @@ class EV3Project(object):
             id_commit = Commit.from_id(self.path, cid)
             # find common parent
             parent_cid = self.find_common_parent(head_commit, id_commit)
-
-            parent_commit = Commit.from_id(self.path, parent_cid)
-            changes_to_head = Changeset(parent_commit, head_commit)
-            changes_to_commit = Changeset(parent_commit, id_commit)                      
-            proposed_head_commit = head_commit;
-#            print "Head:{0} ID: {1} Parent {2}".format(self.head, cid, parent_cid) 
-#            print "Changes_to_head:{0}".format(changes_to_head)
-#            print "Changes_to_commit:{0}".format(changes_to_commit)
+            if parent_cid == self.head:   # No merging, direct from head
+                self.head = cid;
+            else:                
+                parent_commit = Commit.from_id(self.path, parent_cid)
+                changes_to_head = Changeset(parent_commit, head_commit)
+                changes_to_commit = Changeset(parent_commit, id_commit)                      
+                proposed_head_commit = head_commit;
+    #            print "Head:{0} ID: {1} Parent {2}".format(self.head, cid, parent_cid) 
+    #            print "Changes_to_head:{0}".format(changes_to_head)
+    #            print "Changes_to_commit:{0}".format(changes_to_commit)
           
-            for filename in changes_to_commit.newFiles():
-                if (filename in changes_to_head.newFiles()) and (head_commit.getSHA(filename) != id_commit.getSHA(filename)):   
-                    errors.append("{0} added in both".format(filename))
-                else:
-                    proposed_head_commit.files()[filename] = id_commit.files()[filename];
-            for filename in changes_to_commit.modifiedFiles():
-                if (filename in changes_to_head.modifiedFiles()) and (head_commit.getSHA(filename) != id_commit.getSHA(filename)):    
-                    errors.append("{0} modified in both".format(filename))
-                else:
-                    proposed_head_commit.files()[filename] = id_commit.files()[filename];    
-            for filename in changes_to_commit.removedFiles():
-                if (filename in changes_to_head.modifiedFiles()):
-                    proposed_head_commit.remove_file(filename)                    
-            print "Errors: {0}".format(errors)
+                for filename in changes_to_commit.newFiles():
+                    if (filename in changes_to_head.newFiles()) and (head_commit.getSHA(filename) != id_commit.getSHA(filename)):   
+                        errors.append("{0} added in both".format(filename))
+                    else:
+                        proposed_head_commit.files()[filename] = id_commit.files()[filename];
+                for filename in changes_to_commit.modifiedFiles():
+                    if (filename in changes_to_head.modifiedFiles()) and (head_commit.getSHA(filename) != id_commit.getSHA(filename)):    
+                        errors.append("{0} modified in both".format(filename))
+                    else:
+                        proposed_head_commit.files()[filename] = id_commit.files()[filename];    
+                for filename in changes_to_commit.removedFiles():
+                    if (filename in changes_to_head.modifiedFiles()):
+                        proposed_head_commit.remove_file(filename)                    
+                print "Errors: {0}".format(errors)
             
-            if not errors:
-                new_id = self.findNextCommit();
-                new_commit = Commit.from_merge(self.path, self.head, new_id, cid, proposed_head_commit.files())
-                cs = Changeset(new_commit, id_commit)             
-                if cs.different():
-                    new_commit.save()
-                    data["head"] = new_id;
-                    self.head = new_id;
+                if not errors:
+                    new_id = self.findNextCommit();
+                    new_commit = Commit.from_merge(self.path, self.head, new_id, cid, proposed_head_commit.files())
+                    cs = Changeset(new_commit, id_commit)             
+                    if cs.different():
+                        new_commit.save()
+                        data["head"] = new_id;
+                        self.head = new_id;
+                    else:
+                        data["head"] = cid;
+                        self.head = cid;
                 else:
-                    data["head"] = cid;
-                    self.head = cid;
-            else:
-                self.failedMerges.append(cid)
+                    self.failedMerges.append(cid)
         data = {}
         data["head"] = self.head;
         data["failedMerges"] = self.failedMerges        
