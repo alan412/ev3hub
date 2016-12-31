@@ -118,17 +118,25 @@ table.commits, td.commits {
 
 table.diff{
     border: 1px solid black;
-	padding: 0px;
+	border-collapse:collapse;
+	padding: 5px;
 	margin: 20px;
     margin-left:auto; 
     margin-right:auto;
+}
+td.compare{
+	text-align: center;
+}
+td.file1{
+	text-align: right;
 }
 
 tr.commits:nth-child(even) {background-color: #f2f2f2}
 
 tr.notEquals {background-color: #880000; color: white;}
-tr.onlyOne {color: blue}
-tr.equals {color: gray}
+tr.onlyOne {color: blue;}
+tr.equals {color: gray;}
+
 tr.failedMerge {background-color: #F08080; color: white;}
 tr.head {background-color: #91AA9D;}
 

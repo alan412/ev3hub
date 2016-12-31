@@ -18,18 +18,18 @@ $("#showSameBtn").click(function(){
 <CENTER><button class="button" id="showSameBtn">Hide ones that are the same</button></CENTER>
 
 <TABLE class="diff" width="80%">
-<TR><TH width="5%"></TH><TH width="45%">${commit1.cid()} -  <span class="date">${commit1.time()}</span></TH>
+<TR><TH width="45%">${commit1.cid()} -  <span class="date">${commit1.time()}</span></TH><TH width="5%"></TH>
 	<TH width="45%">${commit2.cid()} - <span class="date">${commit2.time()}</span></TH></TR>
-<TR><TH></TH><TH>${commit1.comment()}</TH><TH>${commit2.comment()}</TH></TR>
+<TR><TH>${commit1.comment()}</TH><TH></TH><TH>${commit2.comment()}</TH></TR>
 % for file in files:
    % if file['1'] == file['2']:
-     <TR class="equals"><TD>==</TD><TD>${file['name']}<TD>${file['name']}</TD></TR>
+     <TR class="equals"><TD class="file1">${file['name']}</TD><TD class="compare">==</TD><TD class="file2">${file['name']}</TD></TR>
    % elif file['1'] and file['2']:
-     <TR class="notEquals"><TD>!=</TD><TD>${file['name']}<TD>${file['name']}</TD></TR>
+     <TR class="notEquals"><TD class="file1">${file['name']}<TD class="compare">!=</TD><TD class="file2">${file['name']}</TD></TR>
    % elif file['1']:
-     <TR class="onlyOne"><TD>+-</TD><TD>${file['name']}<TD></TD></TR>  
+     <TR class="onlyOne"><TD class="file1">${file['name']}</TD><TD class="compare">+-</TD><TD class="file2"></TD></TR>  
    % else:
-     <TR class="onlyOne"><TD>-+</TD><TD><TD>${file['name']}</TD></TR>  
+     <TR class="onlyOne"><TD class="file1"></TD><TD class="compare">-+</TD><TD class="file2">${file['name']}</TD></TR>  
    % endif    
 % endfor
 </TABLE>
