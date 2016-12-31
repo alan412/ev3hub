@@ -42,7 +42,8 @@ p.title{
 	border-radius: 15px;
     cursor: pointer;	
 }
-.project {
+
+div.project {
     position: absolute;
 	left: 10px;
 	display: inline;
@@ -130,6 +131,7 @@ td.compare{
 td.file1{
 	text-align: right;
 }
+
 
 tr.commits:nth-child(even) {background-color: #f2f2f2}
 
