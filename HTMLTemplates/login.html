@@ -38,7 +38,6 @@
 
   	$("#modal-body").html("<P>The username is shared with your whole team (or group) so we recommend something like your FLL team number, i.e. FLL447</P>"+
 		"<P>Your email will only be used if you forget your password to send you a reset link</P>"+
-		"<p>The only characters allowed in user names are: letters, numbers, spaces, periods, dashes, underscores, and parenthesis. Any other characters will be removed</p>"+
 		"<table>"+
 		'<tr><td>Login (Team name):</td><td><input size="40" type="text" name="username" placeholder="Login Name"/></td></tr>'+
 		'<tr><td>Email:</td><td><input type="text" size="40" name="email" placeholder="email"/></td></tr>'+
@@ -85,7 +84,7 @@
   		    alert(result);
   		}
   		else{   
-  		    $("#error").html(result);
+  		    $("#error").html(escapeHTML(result));
 			modal.style.display = "none"; // everything is good :-)
   		}
   	});

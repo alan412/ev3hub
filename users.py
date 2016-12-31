@@ -2,6 +2,7 @@ import os
 import json
 import string
 import time
+import hashlib
 from passlib.apps import custom_app_context as pwd_context
 import smtplib
 import email.utils
@@ -54,12 +55,12 @@ class Users(object):
         if email and (email != self.users[username]['email']):
             self.users[username]['email'] = email
             self.save();
-    def get(self, username):
-        try:
-            result = self.users[username];
-        except:
-            result = ''        
-        return result; 
+    def get(self, username):   # this will return the case version that is in the users list
+        lower_username = username.lower()
+        for key in self.users:
+            if key.lower() == lower_username:
+                return key
+        return ''   # not found        
     def get_email(self, username):
         try:
             result = self.users[username]['email'];
@@ -71,20 +72,24 @@ class Users(object):
             return False;
         else:
             return pwd_context.verify(password, self.users[username]['password'])
+    def get_user_dir(self, username):
+        m = hashlib.sha1()
+        m.update(username)
+        return m.hexdigest()
     def get_project_dir(self, username, project):
         # This will change to not just using username plus project
-        return os.path.join("data", username, project)
+        return os.path.join("data", self.get_user_dir(username), project)
 
     def get_projectlist(self, username):
         projects = [];
-        path = os.path.join('data', username);
+        path = os.path.join('data', self.get_user_dir(username));
         if os.path.exists(path):
            projects = next(os.walk(path))[1]
 
         projects_dates = [];
         if projects:
             for project in projects:
-                updated = os.path.getmtime(os.path.join('data', username, project));
+                updated = os.path.getmtime(self.get_project_dir(username, project));
                 projects_dates.append({'name':project, 'Updated': updated })
 
         return sorted(projects_dates, key=itemgetter('Updated'), reverse=True)

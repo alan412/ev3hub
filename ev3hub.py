@@ -143,7 +143,7 @@ class EV3hub(object):
     @cherrypy.expose
     def createUser(self, username, email, password, password2):
         error = ''
-        username = sanitize(username.lower())
+ #       username = sanitize(username.lower())
         if password != password2:
             error = "Error: Password's don't match!"
         elif self.users.get(username):
