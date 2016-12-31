@@ -60,7 +60,7 @@
 	% endfor
 </TABLE>	
 <div class="help">
-	<button id="helpBtn" class="button">Help</button>
+	<button id="helpBtn" class="button">Explain this to me</button>
 </div>
 <script>
 // Get the modal
@@ -80,10 +80,9 @@ var projectBtn = document.getElementById("projBtn");
 var helpBtn = document.getElementById("helpBtn");
 
 helpBtn.onclick = function(){
-	$("#modal-header").html("Help");
+	$("#modal-header").html("Explain this to me");
 	
-	$("#modal-body").html("<p>Help not available yet</p>"
-    
+	$("#modal-body").html("<p>Explanation not available yet</p>"
 	);
     modal.style.display = "block";		
 }
