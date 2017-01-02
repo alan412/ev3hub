@@ -7,9 +7,46 @@ from passlib.apps import custom_app_context as pwd_context
 import smtplib
 import email.utils
 import random
+import ev3project
 from email.mime.text import MIMEText
 from operator import itemgetter
 
+def getSHA(text):
+    m = hashlib.sha1()
+    m.update(text)
+    return m.hexdigest()
+    
+
+class UserProjects(object):
+    def __init__(self, username):
+        self.path = os.path.join('data', getSHA(username)) 
+        if not os.path.exists(self.path):
+            os.makedirs(self.path)    
+        self.username = username;
+        self.proj_filepath = os.path.join(self.path, 'projects.json')
+        self.load()
+    def load(self):
+        try:
+            with open(self.proj_filepath, 'r') as project_file:
+                self.projects = json.loads(project_file.read())     
+        except:
+            self.projects = {}
+            pass    
+    def save(self):
+        with open(self.proj_filepath, 'w') as project_file:
+               json.dump(self.projects, project_file)
+    def add_project(self, projname):
+        self.projects[projname] = {}
+        self.save();
+    def get_project_list(self):
+        project_list = []
+        print "Getting project list from {0}".format(self.projects)
+        for project in self.projects:
+            print "Project:{0}".format(project)
+            updated = os.path.getmtime(os.path.join(self.path, getSHA(project)));
+            project_list.append({'name':project, 'Updated': updated })
+        return project_list;
+    
 class Users(object):
     def __init__(self):
         self.users = {};
@@ -73,27 +110,21 @@ class Users(object):
         else:
             return pwd_context.verify(password, self.users[username]['password'])
     def get_user_dir(self, username):
-        m = hashlib.sha1()
-        m.update(username)
-        return m.hexdigest()
+        return getSHA(username)
     def get_project_dir(self, username, project):
         # This will change to not just using username plus project
-        return os.path.join("data", self.get_user_dir(username), project)
-
+        return os.path.join("data", self.get_user_dir(username), getSHA(project))
+    def get_project(self, username, project):
+        return ev3project.EV3Project(project, self.get_project_dir(username, project))
+    def new_project(self, username, project, ev3data, who, host):
+        up = UserProjects(username)
+        ev3project.EV3Project.newProject(project, self.get_project_dir(username, project), ev3data, who, host)
+        up.add_project(project)
     def get_projectlist(self, username):
-        projects = [];
-        path = os.path.join('data', self.get_user_dir(username));
-        if os.path.exists(path):
-           projects = next(os.walk(path))[1]
-
-        projects_dates = [];
-        if projects:
-            for project in projects:
-                updated = os.path.getmtime(self.get_project_dir(username, project));
-                projects_dates.append({'name':project, 'Updated': updated })
-
-        return sorted(projects_dates, key=itemgetter('Updated'), reverse=True)
-    
+        up = UserProjects(username);
+        projects_dates = up.get_project_list()
+        
+        return sorted(projects_dates, key=itemgetter('Updated'), reverse=True)    
     def project_exists(self, username, project):
         path = self.get_project_dir(username, project)
         if os.path.exists(path):

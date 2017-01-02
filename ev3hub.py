@@ -10,15 +10,6 @@ import argparse
 from operator import itemgetter
 from users import Users
 
-# this is for Mike Spradling who found the bug which let him
-# violate the system.
-def sanitize(filename):
-    valid_chars = "-_.() %s%s" % (string.ascii_letters, string.digits)
-    clean_filename = ''.join(c for c in filename if c in valid_chars)
-    if clean_filename.startswith(('.',' ')):
-       clean_filename = '_' + clean_filename
-    return clean_filename
-
 def getHostname():
     try:
         return cherrypy.request.headers['X-Real-IP']
@@ -113,7 +104,7 @@ class EV3hub(object):
                 
     @cherrypy.expose
     def newProject(self, project, who, host, ev3file):
-        project = sanitize(project)
+        project = project
         username = Cookie('username').get()
         if not username:
            return self.show_loginpage('')       
@@ -123,11 +114,12 @@ class EV3hub(object):
            return self.show_changeprojectpage('Blank name for project')
         try:      
            ev3data = ev3file.file.read();
-           ev3P = ev3project.EV3Project.newProject(project, self.users.get_project_dir(username, project), ev3data, who, host)
+           ev3P = self.users.new_project(username, project, ev3data, who, host)
            Cookie('project').set(project)
            Cookie('who').set(who)
            Cookie('host').set(host)
         except:
+           raise
            return self.show_changeprojectpage('Error in Project')
         
         return self.show_mainpage(username)    
@@ -143,7 +135,6 @@ class EV3hub(object):
     @cherrypy.expose
     def createUser(self, username, email, password, password2):
         error = ''
- #       username = sanitize(username.lower())
         if password != password2:
             error = "Error: Password's don't match!"
         elif self.users.get(username):
