@@ -4,38 +4,43 @@ Please enter in all fields.<br/>
 	
 <OL>
 <LI>Enter a description of the changes that this upload(commit) has in it</LI>
-<input type="text" name="comment" size="60"/>
+<input type="text" id="comment" name="comment" size="60"/>
 <LI>Enter the name of the programmer that did the update</LI>
 <input type="text" value="${programmer}" name="who"/>
 <LI>Enter the name of the computer you are working on.  (Some teams use multiple computers and it helps to know which computer an update came from)</LI>
 <input type="text" value="${host}" name="host"/>
 <LI>Upload the file for the update</LI>
-<input type="file" name="ev3file"/>
+<input type="file" id="input_file" name="ev3file"/>
 <LI>After everything else is complete, press Upload to finish.</LI>
 <input type="button" class="button" onclick="uploadData()" value="Upload"/>
 </OL>
 </form>
 <script>
 function uploadData(){
-	var formData = new FormData($('form')[0]);
-    $.ajax({
-         url: 'uploadDone',  //Server script to process data
-         type: 'POST',
-         // Form data
-         data: formData,
-         //Options to tell jQuery not to process data or worry about content-type.
-         contentType: false,
-		processData: false,
-		success : function(result){
-		if (!$.trim(result)){
-			alert("Succesful upload and merge.   You should download the newest copy before making changes.")
-			window.location.assign(location.origin);
-		}
-		else{   
-			alert(result);
-			if (result.startsWith('Merge')){
+	if(($('#input_file').val().length) && ($('#comment').val().length)){
+		var formData = new FormData($('form')[0]);
+	    $.ajax({
+	         url: 'uploadDone',  //Server script to process data
+	         type: 'POST',
+	         // Form data
+	         data: formData,
+	         //Options to tell jQuery not to process data or worry about content-type.
+	         contentType: false,
+			processData: false,
+			success : function(result){
+			if (!$.trim(result)){
+				alert("Succesful upload and merge.   You should download the newest copy before making changes.")
 				window.location.assign(location.origin);
-		}}},
-	});
+			}
+			else{   
+				alert(result);
+				if (result.startsWith('Merge')){
+					window.location.assign(location.origin);
+			}}},
+		});
+	}
+	else{
+		alert("You need a file and a description of changes to create a commit.")
+	}
 }
 </script>
