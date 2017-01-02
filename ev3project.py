@@ -12,21 +12,36 @@ class EV3Project(object):
         if os.path.exists(path):
           return None;
         newP = cls(name, path);
-        data = {}
-        data["head"] = 1;
-        data["failedMerges"] = [];
         newP.uploadCommit(ev3data, "Initial Commit", who, host);    
-        with open(newP.fullpath("project.json"), "w") as project_file:
-            json.dump(data, project_file);      
+        newP.save();
         return newP
      
+    def save(self):
+        data = {}
+        data["head"] = self.head;
+        data["failedMerges"] = self.failedMerges;
+        data["name"] = self.name;
+        with open(self.fullpath("project.json"), "w") as project_file:
+            json.dump(data, project_file);      
+    
+    def addIgnoreComment(self, cid, comment):
+        for fm in self.failedMerges:
+            if ("{0}".format(fm) == "{0}".format(cid)):
+                if not self.failedMerges[fm]:
+                    self.failedMerges[fm] = comment;
+                    self.save();
+                    return ""
+                else:
+                    return '{0} already had ignore comment'.format(cid)   # this should be impossible...
+        return '{0} not in failed merge list'.format(cid)
+        
     def fullpath(self, filename):
         return os.path.join(self.path, filename) 
     
     def __init__(self, name, path):
         self.name = name;
         self.path = path
-        self.failedMerges = [];
+        self.failedMerges = {};
         self.head = 1;
         
         if not os.path.exists(self.path):
@@ -139,7 +154,7 @@ class EV3Project(object):
                         data["head"] = cid;
                         self.head = cid;
                 else:
-                    self.failedMerges.append(cid)
+                    self.failedMerges[cid] = ""
         data = {}
         data["head"] = self.head;
         data["failedMerges"] = self.failedMerges        

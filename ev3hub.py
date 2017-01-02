@@ -125,7 +125,6 @@ class EV3hub(object):
         return self.show_mainpage(username)    
     @cherrypy.expose
     def login(self,username=None,password=None):
-        username = username.lower()
         if self.users.verify_password(username, password):
             Cookie('username').set(username)
             return self.show_mainpage(username);
@@ -230,9 +229,15 @@ class EV3hub(object):
            if merge_errors:
               error = merge_errors            
         except:
+            raise 
             error = 'Error in uploading.  Upload not saved'
          
         return error
+
+    @cherrypy.expose
+    def ignoreFailedMerge(self, cid, comment):    
+        ev3P = self.get_project()
+        return ev3P.addIgnoreComment(cid, comment)
         
     @cherrypy.expose
     def diff(self, cid1, cid2):

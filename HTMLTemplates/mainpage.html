@@ -36,23 +36,28 @@
 
 
 <TABLE class="commits" width="100%" border="1">
-<TR><TH>1</TH><TH>2</TH><TH>id</TH><TH>parent</TH><TH>Comments</TH><TH>Time</TH><TH>Who</TH><TH>Host</TH></TR>
+<TR><TH width="30">1</TH><TH width="30">2</TH><TH width="20"></TH><TH width="50">id</TH><TH width="50">from</TH><TH>Comments</TH><TH>Time</TH><TH>Who</TH><TH>Host</TH></TR>
 	% for commit in commits:
-	   % if "{0}".format(commit.cid()) in failedMerges: 
-	      <TR class="failedMerge">
-  		    <TD class="commits"><input type="radio" name="cid1" value="${commit.cid()}"></TD> 
-  			<TD class="commits"><input type="radio" name="cid2" value="${commit.cid()}"></TD>
-	   % elif "{0}".format(commit.cid()) == "{0}".format(head):
-	      <TR class="head">
-  		    <TD class="commits"><input type="radio" name="cid1" value="${commit.cid()}" checked="checked"></TD> 
-  			<TD class="commits"><input type="radio" name="cid2" value="${commit.cid()}" checked="checked"></TD>
-	   % else:
 	      <TR class="commits">
-  		    <TD class="commits"><input type="radio" name="cid1" value="${commit.cid()}"></TD> 
-  			<TD class="commits"><input type="radio" name="cid2" value="${commit.cid()}"></TD>
+	   % if "{0}".format(commit.cid()) in failedMerges: 
+  		    <TD class="radio commits"><input type="radio" name="cid1" value="${commit.cid()}"></TD> 
+  			<TD class="radio commits"><input type="radio" name="cid2" value="${commit.cid()}"></TD>
+	        % if failedMerges["{0}".format(commit.cid())]:
+			   <TD class="ignoreFail" cid="${commit.cid()}" comment="${failedMerges["{0}".format(commit.cid())]}">&#9888;</TD>
+			% else:
+			   <TD class="failedMerge" cid="${commit.cid()}">&#9888;</TD>
+		    % endif
+	   % elif "{0}".format(commit.cid()) == "{0}".format(head):
+  		    <TD class="radio commits"><input type="radio" name="cid1" value="${commit.cid()}" checked="checked"></TD> 
+  			<TD class="radio commits"><input type="radio" name="cid2" value="${commit.cid()}" checked="checked"></TD>
+			<TD class="head">&#10144;</TD>
+	   % else:
+  		    <TD class="radio commits"><input type="radio" name="cid1" value="${commit.cid()}"></TD> 
+  			<TD class="radio commits"><input type="radio" name="cid2" value="${commit.cid()}"></TD>
+			<TD class="merged">&checkmark;</TD>
 	   % endif
-			<TD class="commits"><A HREF="download?cid=${commit.cid()}">${commit.cid()}</TD></A> 
-			<TD class="commits">${commit.parent()}</TD>
+			<TD class="commits id"><A HREF="download?cid=${commit.cid()}">${commit.cid()}</TD></A> 
+			<TD class="commits parent">${commit.parent()}</TD>
 			<TD class="commits">${commit.comment()}</TD> 
 			<TD class="commits date">${commit.time()}</TD>
 			<TD class="commits">${commit.name()}</TD> 
@@ -69,6 +74,31 @@ var modal = document.getElementById('modal');
 // Get the <span> element that closes the modal
 var span = document.getElementsByClassName("close")[0];
 
+$(document).ready(function(){
+	$("td.ignoreFail").click(function(){
+		$("#modal-header").html("Failed merge for commit #" + $(this).attr("cid"));
+		$("#modal-body").html("Comment: " + $(this).attr("comment"));
+		modal.style.display = "block";	
+	});
+	$("td.failedMerge").click(function(){
+		$("#modal-header").html("Failed merge for commit #" + $(this).attr("cid"));
+		$("#modal-body").html('<input type="hidden" name="cid" value="'+ $(this).attr("cid") +'"/>'+
+		  'Enter Comment: <input name="comment" type="text" size="40" placeholder="reason to ignore"/><br/>'+
+		  '<input class="button" type="submit" value="Comment" onclick="submitComment()" /> ' 
+	    );
+	    modal.style.display = "block";	
+	});
+});
+
+function submitComment(){
+	var cid_val = $("input[name=cid]").val();
+	var comment_val = $("input[name=comment]").val();
+	
+	$.post("ignoreFailedMerge", {cid : cid_val, comment : comment_val}, function(result){
+		window.location.assign(location.origin); 
+	});
+};
+
 // Get the button that opens the modal
 var diffBtn = document.getElementById("diffBtn");
 
@@ -82,7 +112,44 @@ var helpBtn = document.getElementById("helpBtn");
 helpBtn.onclick = function(){
 	$("#modal-header").html("Explain this to me");
 	
-	$("#modal-body").html("<p>Explanation not available yet</p>"
+	$("#modal-body").html(
+	"<H1>Background</H1>"+
+	"<p>The EV3 file is in reality a zip file with each program and myblock as individual files within it.</p>"+
+	"<p>Several coaches have independently come up with ugly solutions that involve unzipping the zip file and trying to combine the contents</p>"+
+	"<p>This automates that ugly solution so every team doesn't have to come up with their own way</p>"+
+	"<p>In typical version control, we call each version a 'commit', and the version that has the combined changes the 'head'</p>"+
+	"<H1>How to use</H1>"+
+	"<H2>Recommended flow</H2>"+
+	"<OL><LI>Create an account and project (Obiviously you have done that)</LI>"+
+	"<LI>Before working each time, download using the large download button</LI>"+
+	"<LI>After working each time (or sooner), upload using the large upload button<UL><LI>EV3Hub will attempt to merge all changes from the same download.  If it can't, then it will tell you there was a failed merge and will display that commit with a red background.</LI><LI>It is still available to download, but that means its contents are not captured in the 'head'.</LI><LI>If this occurs, simply download (using the large download button) and make the changes to that one and upload again.</LI></UL></LI>"+
+	"</OL><H2>Other features</H2>"+
+	"<UL><LI>Select 2 commits and press Show Diff to see the difference between them</LI>"+
+	"<LI>You can download any commit by clicking on the id number that is a link</LI>"+
+	"<LI>The 'head' (what you get when you press the large download button) is identified by being a darker color row</LI>"+
+	"</UL>"+
+	"<p>8</p>"+
+	"<p>1</p>"+
+	"<p>2</p>"+
+	"<p>3</p>"+
+	"<p>4</p>"+
+	"<p>5</p>"+
+	"<p>6</p>"+
+	"<p>7</p>"+
+	"<p>8</p>"+
+	"<p>1</p>"+
+	"<p>2</p>"+
+	"<p>3</p>"+
+	"<p>4</p>"+
+	"<p>5</p>"+
+	"<p>6</p>"+
+	"<p>7</p>"+
+	"<p>8</p>"+
+	"TODO: finish"+
+
+	
+	
+	""
 	);
     modal.style.display = "block";		
 }
