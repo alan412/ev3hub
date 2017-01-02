@@ -105,6 +105,22 @@ class EV3Project(object):
                 parents2.append("0");
         return (set(parents1) & set(parents2)).pop()   
     
+    def remove_failed_merges(self, commit):
+        print "In remove failed merge"
+        commit = Commit.from_id(self.path, commit.parent());
+        while commit and commit.parent():
+            foundList = [];
+            for fm in self.failedMerges:
+                print "FM-{0},{1}".format(fm, commit.cid())
+                if ("{0}".format(fm) == "{0}".format(commit.cid())):
+                    print " wow"
+                    foundList.append(fm)
+            if foundList:
+                for fm in foundList:
+                    self.failedMerges.pop(fm, None)
+                commit = Commit.from_id(self.path, commit.parent());
+            else:
+                return  # Can return because if none were found, none will be found for parents either....
     def merge(self, cid):
         data = {};
         errors = [];
@@ -143,6 +159,7 @@ class EV3Project(object):
                 print "Errors: {0}".format(errors)
             
                 if not errors:
+                    self.remove_failed_merges(id_commit);
                     new_id = self.findNextCommit();
                     new_commit = Commit.from_merge(self.path, self.head, new_id, cid, proposed_head_commit.files())
                     cs = Changeset(new_commit, id_commit)             
@@ -151,6 +168,7 @@ class EV3Project(object):
                         data["head"] = new_id;
                         self.head = new_id;
                     else:
+                        # Throw away new commit
                         data["head"] = cid;
                         self.head = cid;
                 else:
