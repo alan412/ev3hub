@@ -10,12 +10,14 @@ import random
 import ev3project
 from email.mime.text import MIMEText
 from operator import itemgetter
+import urllib
 
 def getSHA(text):
     m = hashlib.sha1()
     m.update(text)
     return m.hexdigest()
     
+
 
 class UserProjects(object):
     def __init__(self, username):
@@ -139,10 +141,11 @@ class Users(object):
            mail = self.get_email(username);
            if not mail:
               return "No email defined for user:{0}".format(username)
-           print "1"
+
            token = self.create_forgot_token(username)
-           print "2"
-           msg = MIMEText("Please go to http://beta.ev3hub.com/forgot?username=" + username + 
+
+           safe_username=urllib.quote_plus(username)
+           msg = MIMEText("Please go to http://beta.ev3hub.com/forgot?username=" + safe_username + 
                "&token=" + token + " to reset your password.  If you did not request that you had forgotten " +
                "your password, then you can safely ignore this e-mail.\n\nThank you,\nThe EV3HUB team");          
 
@@ -151,7 +154,7 @@ class Users(object):
            msg['From'] = email.utils.formataddr(('EV3Hub Admin', from_email))
            msg['Subject'] = 'Forgotten Password'
            
-   #        print "Simulating sending: {0}, {1},{2}".format(from_email, mail, msg.as_string())
+#           print "Simulating sending: {0}, {1},{2}".format(from_email, mail, msg.as_string())
 #           return ''
 
            server = smtplib.SMTP('localhost')       
