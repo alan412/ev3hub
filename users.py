@@ -151,13 +151,12 @@ class Users(object):
            msg['From'] = email.utils.formataddr(('EV3Hub Admin', from_email))
            msg['Subject'] = 'Forgotten Password'
            
-           print "Simulating sending: {0}, {1},{2}".format(from_email, mail, msg.as_string())
-           return ''
+   #        print "Simulating sending: {0}, {1},{2}".format(from_email, mail, msg.as_string())
+#           return ''
 
            server = smtplib.SMTP('localhost')       
            try:
               server.sendmail(from_email, [mail], msg.as_string())
-              #print "Simulating sending: {0}, {1},{2}".format(from_email, mail, msg.as_string())
            finally:
               server.quit()
               return ''
