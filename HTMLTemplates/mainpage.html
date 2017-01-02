@@ -122,34 +122,18 @@ helpBtn.onclick = function(){
 	"<H2>Recommended flow</H2>"+
 	"<OL><LI>Create an account and project (Obiviously you have done that)</LI>"+
 	"<LI>Before working each time, download using the large download button</LI>"+
-	"<LI>After working each time (or sooner), upload using the large upload button<UL><LI>EV3Hub will attempt to merge all changes from the same download.  If it can't, then it will tell you there was a failed merge and will display that commit with a red background.</LI><LI>It is still available to download, but that means its contents are not captured in the 'head'.</LI><LI>If this occurs, simply download (using the large download button) and make the changes to that one and upload again.</LI></UL></LI>"+
+	"<LI>After working each time (or sooner), upload using the large upload button<UL><LI>EV3Hub will attempt to merge all changes from the same download.  If it can't, then it will tell you there was a failed merge and will display that commit with a warning sign on a red background.</LI><LI>It is still available to download, but that means its contents are not captured in the 'head'.</LI><LI>If this occurs, simply download (using the large download button) and make the changes to that one and upload again.</LI></UL></LI>"+
 	"</OL><H2>Other features</H2>"+
 	"<UL><LI>Select 2 commits and press Show Diff to see the difference between them</LI>"+
 	"<LI>You can download any commit by clicking on the id number that is a link</LI>"+
-	"<LI>The 'head' (what you get when you press the large download button) is identified by being a darker color row</LI>"+
+	"<LI>The 'head' (what you get when you press the large download button) is identified by a right arrow</LI>"+
+	"<LI>You can mark any failed merge with a comment for why it shouldn't still be red, by clicking on the red warning</LI>"+
 	"</UL>"+
-	"<p>8</p>"+
-	"<p>1</p>"+
-	"<p>2</p>"+
-	"<p>3</p>"+
-	"<p>4</p>"+
-	"<p>5</p>"+
-	"<p>6</p>"+
-	"<p>7</p>"+
-	"<p>8</p>"+
-	"<p>1</p>"+
-	"<p>2</p>"+
-	"<p>3</p>"+
-	"<p>4</p>"+
-	"<p>5</p>"+
-	"<p>6</p>"+
-	"<p>7</p>"+
-	"<p>8</p>"+
-	"TODO: finish"+
-
-	
-	
-	""
+	"<H2>How does this work?</H2>"+
+	"<UL><LI>When you download, it puts an extra file in the project called ev3hub.json which lets ev3hub know where it came from.</LI>"+
+	"<LI>Then when it is uploaded, it looks for that file.  If it doesn't exist, it gets a 'from' of 0.  Otherwise, it knows where it came from."+
+	"<LI>If it exists, it looks to see what changes have been made.   If a program hasn't been changed in two different commits from the same place, then it merges them.</LI>"+
+	"<LI>So imagine that two different students both download commit #1.   Each of them creates a different new program - DriveToLine and DriveCentimeters.  They each upload, and ev3hub creates a new commit that has both programs in it."
 	);
     modal.style.display = "block";		
 }
