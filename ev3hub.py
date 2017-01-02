@@ -230,11 +230,9 @@ class EV3hub(object):
            if merge_errors:
               error = merge_errors            
         except:
-#            raise
             error = 'Error in uploading.  Upload not saved'
          
-        username = Cookie('username').get('')
-        return self.show_mainpage(username, error)
+        return error
         
     @cherrypy.expose
     def diff(self, cid1, cid2):
