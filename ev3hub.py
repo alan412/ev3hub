@@ -98,6 +98,7 @@ class EV3hub(object):
             return self.show_loginpage('')
         if self.users.project_exists(username, project):
             Cookie('project').set(project)
+            raise cherrypy.HTTPRedirect("/")
             return self.show_mainpage(username)
         else:
             return self.show_changeprojectpage('Please select an existing project')
@@ -119,9 +120,8 @@ class EV3hub(object):
            Cookie('who').set(who)
            Cookie('host').set(host)
         except:
-           raise
            return self.show_changeprojectpage('Error in Project')
-        
+        raise cherrypy.HTTPRedirect("/")
         return self.show_mainpage(username)    
     @cherrypy.expose
     def login(self,username=None,password=None):
@@ -227,9 +227,13 @@ class EV3hub(object):
            cid = ev3P.uploadCommit(ev3data, comment, who, host)
            merge_errors = ev3P.merge(cid)
            if merge_errors:
-              error = merge_errors            
+              if len(merge_errors) == 1:
+                  error = 'Merge Error:'
+              else:
+                  error = 'Merge Errors:'
+              for me in merge_errors:
+                  error = error + '\n' + me
         except:
-            raise 
             error = 'Error in uploading.  Upload not saved'
          
         return error

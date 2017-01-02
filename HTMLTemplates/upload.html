@@ -27,15 +27,15 @@ function uploadData(){
          contentType: false,
 		processData: false,
 		success : function(result){
-		if (!$.trim(result)){   
+		if (!$.trim(result)){
+			alert("Succesful upload and merge.   You should download the newest copy before making changes.")
 			window.location.assign(location.origin);
 		}
 		else{   
-		    alert(result);
-		}},
-		error : function(result){
 			alert(result);
-		}
+			if (result.startsWith('Merge')){
+				window.location.assign(location.origin);
+		}}},
 	});
 }
 </script>
