@@ -6,24 +6,22 @@ This starts from the great work done by Thad Hughes at https://github.com/Thadde
 #Disclaimer 
 This is from reverse engineering the EV3 format.  (which could change at any time)
 There is absolutely **NO** promise made that your data will be ok.   It has not been thoroughly tested.
-This is in progress and being developed.   If you want a more stable one, go to the original work mentioned above. 
-This is an *EARLY* early, **EARLY** alpha release.   It will break.
-If you are uncomfortable setting up python libraries to run and running your own webserver, back away slowly now....
 
 #Known Issues 
-A few known problems:
+The only known issues at this time.
 
 1. Very little verification and worthless errors
-2. If you forget your password, then you are up the creek without a paddle.   I haven't put in the "forgot password" yet. 
-3. Right now, items are put into cookies, but not in any kind of secure way
-4. the UI is ugly and is as bare bones as I could justify for testing
-5. I have only tested this on my mac, and only with a few dummy files. 
- 
+2. Almost no help file
+
 #To Run
-python ev3hub.py
-It will put a webserver on port 8000 on the machine you run on
+This is available at http://beta.ev3hub.com
+
+If you want to run your own server, use virtualenv and the requirements.txt file to get the needed Python bits.
+
+* For Debug: python ev3hub.py development.conf   
+* For 'Production': python ev3hub.py production.conf
+
+It will put a webserver on port 8080 on the machine you run on
  
-#Setup
-This uses python 2.7.  It uses a few packages: cherrypy, mako, passlib, zipfile, json
- 
+#Issues
 Issues?  Please open them on the github project at https://github.com/alan412/ev3hub 
