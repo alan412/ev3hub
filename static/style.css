@@ -123,6 +123,30 @@ table.commits td{
 table.commits, td.commits {
     border-left-style: 1px solid black;
     border-right-style: 1px solid black;
+	padding : 2px 5px;
+}
+
+table.commits th.radiodiff {
+	width : 20px;
+}
+table.commits th.symbol {
+	width : 20px;
+}
+table.commits th.cid {
+	width : 40px;
+}
+table.commits th.comments {
+	padding : 5px;
+	width : 50%;
+}
+table.commits th.time {
+	width : 20%;
+}
+table.commits th.who {
+	width : 10%;
+}
+table.commits th.host {
+	width : 10%;
 }
 
 tr.commits:nth-child(even) {background-color: #f2f2f2;}
