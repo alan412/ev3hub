@@ -106,11 +106,12 @@ class Users(object):
         except:
             result = ''
         return result;
-    def verify_password(self, username,password):
-        if self.get(username) == '':
-            return False;
-        else:
+    def verify_password(self, username_in,password):
+        username = self.get(username_in)
+        if username:
             return pwd_context.verify(password, self.users[username]['password'])
+        else:
+            return False;
     def get_user_dir(self, username):
         return getSHA(username)
     def get_project_dir(self, username, project):
@@ -134,8 +135,9 @@ class Users(object):
         else:
             return False
     
-    def mail_token(self, username):
-        if not self.get(username):
+    def mail_token(self, username_in):
+        username = self.get(username_in)
+        if not username:
             return "Login doesn't exist"
         else:
            mail = self.get_email(username);
