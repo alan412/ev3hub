@@ -35,33 +35,33 @@
 <button id="diffBtn" class="button">Show Diff</button>
 
 
-<TABLE class="commits" width="100%" border="1">
+<TABLE class="commits" width="100%">
 <TR><TH class="radiodiff">1</TH><TH class="radiodiff">2</TH><TH class="symbol"</TH><TH class="cid">id</TH><TH class="cid">from</TH><TH class="comments">Comments</TH><TH class="time">Date / Time</TH><TH class="who">Who</TH><TH class="host">Host</TH></TR>
 	% for commit in commits:
-	      <TR class="commits">
+	      <TR class="commits" cid="${commit.cid()}" comment="${commit.comment()}">
 	   % if "{0}".format(commit.cid()) in failedMerges: 
-  		    <TD class="radio commits"><input type="radio" name="cid1" value="${commit.cid()}"></TD> 
-  			<TD class="radio commits"><input type="radio" name="cid2" value="${commit.cid()}"></TD>
+  		    <TD class="radio"><input type="radio" name="cid1" value="${commit.cid()}"></TD> 
+  			<TD class="radio"><input type="radio" name="cid2" value="${commit.cid()}"></TD>
 	        % if failedMerges["{0}".format(commit.cid())]:
 			   <TD class="ignoreFail" cid="${commit.cid()}" comment="${failedMerges["{0}".format(commit.cid())]}">&#9888;</TD>
 			% else:
 			   <TD class="failedMerge" cid="${commit.cid()}">&#9888;</TD>
 		    % endif
 	   % elif "{0}".format(commit.cid()) == "{0}".format(head):
-  		    <TD class="radio commits"><input type="radio" name="cid1" value="${commit.cid()}" checked="checked"></TD> 
-  			<TD class="radio commits"><input type="radio" name="cid2" value="${commit.cid()}" checked="checked"></TD>
+  		    <TD class="radio"><input type="radio" name="cid1" value="${commit.cid()}" checked="checked"></TD> 
+  			<TD class="radio"><input type="radio" name="cid2" value="${commit.cid()}" checked="checked"></TD>
 			<TD class="head">&#10144;</TD>
 	   % else:
-  		    <TD class="radio commits"><input type="radio" name="cid1" value="${commit.cid()}"></TD> 
-  			<TD class="radio commits"><input type="radio" name="cid2" value="${commit.cid()}"></TD>
+  		    <TD class="radio"><input type="radio" name="cid1" value="${commit.cid()}"></TD> 
+  			<TD class="radio"><input type="radio" name="cid2" value="${commit.cid()}"></TD>
 			<TD class="merged">&checkmark;</TD>
 	   % endif
-			<TD class="commits id"><A HREF="download?cid=${commit.cid()}">${commit.cid()}</TD></A> 
-			<TD class="commits parent">${commit.parent()}</TD>
-			<TD class="commits">${commit.comment()}</TD> 
-			<TD class="commits date">${commit.time()}</TD>
-			<TD class="commits">${commit.name()}</TD> 
-			<TD class="commits">${commit.host()}</TD> </TR>
+			<TD class="id" cid="${commit.cid()}">${commit.cid()}</TD></A> 
+			<TD class="parent">${commit.parent()}</TD>
+			<TD>${commit.comment()}</TD> 
+			<TD class="date">${commit.time()}</TD>
+			<TD>${commit.name()}</TD> 
+			<TD>${commit.host()}</TD> </TR>
 	% endfor
 </TABLE>	
 <div class="help">
@@ -88,7 +88,19 @@ $(document).ready(function(){
 	    );
 	    modal.style.display = "block";	
 	});
+	$("tr.commits").on('click', 'td:gt(2)' , function(){
+		var parentRow = $(this).parent()
+		$("#modal-header").html("Details for commit #" + parentRow.attr("cid") + " : " + parentRow.attr("comment"));
+		$.post("details", {cid: parentRow.attr("cid")}, function(result){
+			$("#modal-body").html(result);
+			$("#modal-body .date").each(function(){
+				$( this ).text(pythonDatetimeToHTML($(this).text()));		   	
+			});
+		} );
+		modal.style.display = "block";			
+	});
 });
+
 
 function submitComment(){
 	var cid_val = $("input[name=cid]").val();
@@ -173,6 +185,8 @@ diffBtn.onclick = function() {
 	
     modal.style.display = "block";
 }
+
+
 
 logout.onclick = function(){
 	window.location.assign("logout")

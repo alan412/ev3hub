@@ -108,7 +108,13 @@ tr.projects:hover{
 	cursor: pointer;
 }
 
-table.commits {
+table.commits th, table.details th{
+	border-left: 1px solid white;
+	border-right: 1px solid white;
+}
+
+table.commits, table.details {
+	border: 2px solid black;
     border-collapse: collapse;
 	table-layout: fixed;
 	width: 98%;
@@ -117,15 +123,12 @@ table.commits {
 	margin: 10px 5px;
 }
 
-table.commits td{
+
+table.commits td, table.details td{
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
-}
-
-table.commits, td.commits {
-    border-left-style: 1px solid black;
-    border-right-style: 1px solid black;
+	border: 1px solid black;
 	padding : 2px 5px;
 }
 
@@ -152,7 +155,12 @@ table.commits th.host {
 	width : 10%;
 }
 
-tr.commits:nth-child(even) {background-color: #f2f2f2;}
+table.commits tr:nth-child(even) {background-color: #f2f2f2;}
+
+table.commits tr:hover{
+	background-color: #3E606F;
+	cursor: pointer;
+}
 
 table.diff{
     border: 1px solid black;
@@ -169,6 +177,11 @@ td.file1{
 	text-align: right;
 }
 
+table.details tr:nth-child(even) {background-color: #f2f2f2; }
+
+div#detailsByDate{
+	display: none;
+}
 
 
 tr.notEquals {background-color: #880000; color: white;}
@@ -177,11 +190,11 @@ tr.equals {color: gray;}
 
 td.radio 	   {text-align: center;}
 td.failedMerge {text-align: center; background-color: #F08080; color: white; cursor: pointer;}
-td.ignoreFail  {text-align: center; cursor: pointer;}
+td.ignoreFail  {text-align: center;}
 td.head        {text-align: right;}
 td.merged      {text-align: center;}
 td.parent      {text-align: right; color: gray;}
-td.id          {text-align: right;}
+td.id          {text-align: right; cursor: pointer;}
 
 th {
     background-color: #193441;

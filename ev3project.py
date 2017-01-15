@@ -83,6 +83,18 @@ class EV3Project(object):
 
         return Commit.from_id(self.path, commit_id).get_ev3_data(self.name)
         
+    def getDetails(self, cid):
+        main_commit = Commit.from_id(self.path, cid)
+        commits = self.getListOfCommits()
+        fileDetails = {}
+        for f in main_commit.files():
+            # we want to go backwards and find the first instance of each file
+            for commit in reversed(commits):
+                if commit.getSHA(f) == main_commit.getSHA(f):
+                    fileDetails[f] = commit
+                    break;
+        return fileDetails
+        
     def uploadCommit(self, ev3data, comment, who, host):
         cid = self.findNextCommit();
         commit = Commit.from_ev3file(self.path, cid, ev3data, comment, who, host, self.name);

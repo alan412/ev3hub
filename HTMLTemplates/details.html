@@ -1,0 +1,44 @@
+<script>
+$("#showNameBtn").click(function(){
+    $("#detailsByName").show();
+	$("#detailsByDate").hide();
+})
+$("#showDateBtn").click(function(){
+    $("#detailsByName").hide();
+	$("#detailsByDate").show();
+})
+$("#downloadCommit").click(function(){
+	window.location = "download?cid=${commit.cid()}"
+})
+
+</script>
+
+<CENTER><P class="button" id="downloadCommit">&darr; Download this commit &darr;</P></CENTER>
+
+Below is the last change for each program
+<CENTER>
+<TABLE>
+<TR><TD><P class="button" id="showNameBtn">Sort by Name</P></TD>
+<TD><P class="button" id="showDateBtn">Sort by Date</P></TD>
+</TR></TABLE>
+</CENTER>
+<DIV id="detailsByName">
+<TABLE class="details">
+<TR><TH width="30%">File</TH><TH width="5%">ID</TH><TH width="20%">Date / Time</TH><TH width="45%">Comment</TH>
+% for file in sorted(fileDetails, key=lambda s: s.lower()):
+% if file.endswith('ev3p'):
+<TR><TD>${file}</TD><TD>${fileDetails[file].cid()}</TD><TD class="date">${fileDetails[file].time()}</TD><TD>${fileDetails[file].comment()}</TD></TR>
+% endif
+% endfor
+</TABLE>
+</DIV>
+<DIV id="detailsByDate">
+<TABLE class="details">
+<TR><TH width="30%">File</TH><TH width="5%">ID</TH><TH width="20%">Date / Time</TH><TH width="45%">Comment</TH>
+% for file in sorted(fileDetails, key=lambda s: fileDetails[s].time(), reverse=True):
+% if file.endswith('ev3p'):
+<TR><TD>${file}</TD><TD>${fileDetails[file].cid()}</TD><TD class="date">${fileDetails[file].time()}</TD><TD>${fileDetails[file].comment()}</TD></TR>
+% endif
+% endfor
+</TABLE>
+</DIV>

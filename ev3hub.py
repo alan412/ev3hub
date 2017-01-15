@@ -57,6 +57,8 @@ class EV3hub(object):
         
     def show_diffpage(self, project, commit1, commit2, files, error=''):
         return self.template("diff.html", project=project, commit1 = commit1, commit2 = commit2, files = files, error = error)
+    def show_detailspage(self, project, commit, fileDetails, error=''):
+        return self.template("details.html", project=project, commit = commit, fileDetails = fileDetails, error = error)
     
     def show_mainpage(self, username, error=''):
         project = Cookie('project').get("")
@@ -242,6 +244,14 @@ class EV3hub(object):
     def ignoreFailedMerge(self, cid, comment):    
         ev3P = self.get_project()
         return ev3P.addIgnoreComment(cid, comment)
+    
+    @cherrypy.expose
+    def details(self, cid):
+        ev3P = self.get_project()
+        fileDetails = ev3P.getDetails(cid)
+        commit = ev3P.getCommit(cid)
+
+        return self.show_detailspage(ev3P.name, commit, fileDetails)    
         
     @cherrypy.expose
     def diff(self, cid1, cid2):
