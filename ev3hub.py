@@ -227,6 +227,8 @@ class EV3hub(object):
 
            ev3P = self.get_project()
            cid = ev3P.uploadCommit(ev3data, comment, who, host)
+           if not cid:
+               return 'Error: No changes from head, upload not saved'
            merge_errors = ev3P.merge(cid)
            if merge_errors:
               if len(merge_errors) == 1:

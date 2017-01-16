@@ -44,7 +44,11 @@ class Commit(object):
       if self.path:
           with open(self.filename, "w") as outfile:
               json.dump(self.commitDetails, outfile)      
-    
+    def delete(self):
+       if self.filename:
+           os.remove(self.filename);
+           self.filename = ''
+           self.path = ''
     def get_ev3_data(self, projName):
         variables = {}
         programs = []

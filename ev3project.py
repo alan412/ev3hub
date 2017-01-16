@@ -98,6 +98,11 @@ class EV3Project(object):
     def uploadCommit(self, ev3data, comment, who, host):
         cid = self.findNextCommit();
         commit = Commit.from_ev3file(self.path, cid, ev3data, comment, who, host, self.name);
+        head = Commit.from_id(self.path, self.head)
+        cs = Changeset(commit, head);
+        if not cs.different():
+            commit.delete();
+            return 0;
         return cid;
 
     def find_common_parent(self, commit1, commit2):
