@@ -12,14 +12,9 @@ $("#downloadCommit").click(function(){
 })
 
 </script>
-
 <CENTER><P class="button" id="downloadCommit">&darr; Download this commit &darr;</P></CENTER>
-
-
-<CENTER><IMG WIDTH="80%" TITLE="program call graph" SRC="graph?cid=${commit.cid()}" ALT="program call graph"/></CENTER>
-
-<br/>
-Below is the last change for each program
+<H1>Last Program Changes</H1>
+<P>This shows when every program (and myblock) in your project was changed last.  You can sort by name or when it was last changed using the buttons.</P>
 <CENTER>
 <TABLE>
 <TR><TD><P class="button" id="showNameBtn">Sort by Name</P></TD>
@@ -46,3 +41,6 @@ Below is the last change for each program
 % endfor
 </TABLE>
 </DIV>
+<H1>Call Graph</H1>
+<P>This shows every program and what MyBlocks it calls (and MyBlocks they call and so on).  If you title a program starting with "M_" then it will show up as solid gray.  (FLL #447 uses this convention for missions.)</P>
+<CENTER><IMG WIDTH="95%" TITLE="${project}-#${commit.cid()} call graph" SRC="graph?cid=${commit.cid()}" ALT="program call graph"/></CENTER>
