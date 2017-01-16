@@ -196,6 +196,14 @@ class EV3hub(object):
            self.users.change_email(username, email)  
         else:
            return 'Password was incorrect'    
+    @cherrypy.expose
+    def graph(self, cid):
+        project = Cookie('project').get('')
+        username = Cookie('username').get('')
+        ev3P = ev3project.EV3Project(project, self.users.get_project_dir(username, project))
+          
+        cherrypy.response.headers['Content-Type'] = 'image/svg+xml'    
+        return ev3P.graph(cid)       
 
     @cherrypy.expose
     def download(self, cid):
@@ -210,7 +218,6 @@ class EV3hub(object):
           
         cherrypy.response.headers['Content-Type'] = 'application/x-download'    
         cherrypy.response.headers['Content-Disposition'] = 'attachment; filename="{0}"'.format(filename)
-        print cherrypy.response.headers
         return ev3P.download(cid)
     
     @cherrypy.expose

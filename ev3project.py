@@ -83,6 +83,13 @@ class EV3Project(object):
 
         return Commit.from_id(self.path, commit_id).get_ev3_data(self.name)
         
+    def graph(self, cid):
+        commit_id = cid;
+        if cid == "head":
+            commit_id = self.head;
+
+        return Commit.from_id(self.path, commit_id).graph()
+        
     def getDetails(self, cid):
         main_commit = Commit.from_id(self.path, cid)
         commits = self.getListOfCommits()

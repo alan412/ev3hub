@@ -7,6 +7,7 @@ import cStringIO
 import hashlib
 import argparse
 import xml.etree.ElementTree as ET
+import pygraphviz
 
 class Commit(object):
     def __init__(self, path, commit_id, commitDetails): 
@@ -49,6 +50,27 @@ class Commit(object):
            os.remove(self.filename);
            self.filename = ''
            self.path = ''
+    def graph(self):
+        graph = pygraphviz.AGraph()
+        graph.graph_attr.update(ranksep='2', ratio='compress',size='7.5,10')
+        graph.node_attr.update(fontname='Arial', fontsize='30')
+        for filename in self.files():
+            if filename.endswith(".ev3p"):
+                callee = filename[:-5]  # strip off the .ev3p
+                if callee.startswith("M_"):
+                    graph.add_node(callee, style='filled', fillcolor='gray')
+                else:
+                    graph.add_node(callee)   
+                repo_filename = os.path.join(self.path, "repo", self.files()[filename])
+                with open(repo_filename, 'r') as f:
+                    for line in f:
+                        if line.find('.ev3p') != -1:
+                           begin = line.find('Target') + 8
+                           end = line.find('\\.ev3p')
+                           graph.add_edge(callee, line[begin:end])
+        imgbuf = cStringIO.StringIO()
+        graph.draw(imgbuf, format='svg',prog='dot')
+        return imgbuf.getvalue();
     def get_ev3_data(self, projName):
         variables = {}
         programs = []
