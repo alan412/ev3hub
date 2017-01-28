@@ -240,9 +240,9 @@ class EV3hub(object):
         ev3P = self.get_project()
   
         if cid == 'head':
-          filename = project + ".ev3"
+          filename = ev3P.name + ".ev3"
         else:
-          filename = "{0}-v{1}.ev3".format(project, cid)
+          filename = "{0}-v{1}.ev3".format(ev3P.name, cid)
           
         cherrypy.response.headers['Content-Type'] = 'application/x-download'    
         cherrypy.response.headers['Content-Disposition'] = 'attachment; filename="{0}"'.format(filename)
