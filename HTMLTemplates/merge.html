@@ -1,0 +1,37 @@
+<script>
+function submitMerge(){
+	var from = $('input[type="radio"][special="merge"]:checked').map(function(){
+		return this.value + ':' + this.name;
+	}).get();
+	
+	$.post("manual_merge", $.param({'cid': ${commit.cid()}, 'files': from}, true), function(result){
+		if (!$.trim(result)){
+			alert("Succesful manual merge.   You should download the newest copy before making changes.")
+		}
+		else{   
+			alert("Update still failed to merge.  Probably due to someone else submitting another commit.  Please try again");
+		}
+		window.location.assign(location.origin); 
+	});
+};
+</script>
+
+<HR/>
+<P>You can manually merge this by selecting which files come from this commit and which ones come from the head.</P>
+<P>This only has the files in it that can't be automatically merged</P>
+<P><EM>WARNING! You can cause a bad EV3 file by mixing and matching</EM></P>
+<TABLE class="merge" width="80%">
+<TR><TH>Filename</TH><TH>${commit.cid()}</TH><TH>Head</TH></TR>	
+% for file in different:
+<TR>
+	<TD>${file}</TD>
+    <TD class="radio"><input special="merge" type="radio" name="${file}" value="${commit.cid()}"></TD> 
+	<TD class="radio"><input special="merge" type="radio" name="${file}" value="head" checked="checked"></TD>
+</TR>
+% endfor
+
+</TABLE>
+<CENTER>
+<input class="button" type="submit" value="Merge" onclick="submitMerge()" />  
+</CENTER>
+

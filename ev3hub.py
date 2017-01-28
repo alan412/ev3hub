@@ -59,7 +59,8 @@ class EV3hub(object):
         return self.template("diff.html", project=project, commit1 = commit1, commit2 = commit2, files = files, error = error)
     def show_detailspage(self, project, commit, fileDetails, error=''):
         return self.template("details.html", project=project, commit = commit, fileDetails = fileDetails, error = error)
-    
+    def show_mergepage(self, project, commit, different, error=''):
+        return self.template("merge.html",project=project, commit = commit, different = different, error = error)
     def show_mainpage(self, username, error=''):
         project = Cookie('project').get("")
         if not project:
@@ -198,19 +199,46 @@ class EV3hub(object):
            return 'Password was incorrect'    
     @cherrypy.expose
     def graph(self, cid):
-        project = Cookie('project').get('')
-        username = Cookie('username').get('')
-        ev3P = ev3project.EV3Project(project, self.users.get_project_dir(username, project))
-          
+        ev3P = self.get_project()      
         cherrypy.response.headers['Content-Type'] = 'image/svg+xml'    
         return ev3P.graph(cid)       
+        
+    @cherrypy.expose
+    def merge(self, cid):
+        result = ""
+        ev3P = self.get_project()        
+        commit = ev3P.getCommit(cid)
+        (p, added, modified) = ev3P.try_merge(commit)
+        
+        different = sorted(added+modified, key=unicode.lower)
+        
+        return self.show_mergepage(ev3P, commit, different);
+    @cherrypy.expose
+    def manual_merge(self, cid, files):
+        ev3P = self.get_project()
+        commit_files = []
+        head_files = []
 
+        if isinstance(files, basestring):
+            info = files.split(':', 1);
+            if info[0] == 'head':
+                head_files.append(info[1])
+            else:
+                commit_files.append(info[1])       
+        else:    
+            for line in files:
+                info = line.split(':', 1);
+                if info[0] == 'head':
+                    head_files.append(info[1])
+                else:
+                    commit_files.append(info[1])
+        error = ev3P.manual_merge(cid, commit_files, head_files)
+        return error
+        
     @cherrypy.expose
     def download(self, cid):
-        project = Cookie('project').get('')
-        username = Cookie('username').get('')
-        ev3P = ev3project.EV3Project(project, self.users.get_project_dir(username, project))
-
+        ev3P = self.get_project()
+  
         if cid == 'head':
           filename = project + ".ev3"
         else:
@@ -245,6 +273,7 @@ class EV3hub(object):
               for me in merge_errors:
                   error = error + '\n' + me
         except:
+            raise
             error = 'Error in uploading.  Upload not saved'
          
         return error

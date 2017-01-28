@@ -179,7 +179,12 @@ class Commit(object):
                                  "files" : files}
 
         return cls(project_path, newCid, commitDetails)
-      
+    @classmethod
+    def from_manual_merge(cls, project_path, head, newCid, cid, files):
+        commitDetails = {"parent" : head, "mergedfrom" : cid, "time" : time.time(), "name" : "EV3Hub", "host" : "", "comment" : "Manually merged from {0}".format(cid), 
+                                 "files" : files}
+
+        return cls(project_path, newCid, commitDetails)      
     @classmethod
     def file_from_id(cls, path, cid):
       return os.path.join(path, "{0}.json".format(cid));

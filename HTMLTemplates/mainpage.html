@@ -45,7 +45,11 @@
 	        % if failedMerges["{0}".format(commit.cid())]:
 			   <TD class="ignoreFail" cid="${commit.cid()}" comment="${failedMerges["{0}".format(commit.cid())]}">&#9888;</TD>
 			% else:
-			   <TD class="failedMerge" cid="${commit.cid()}">&#9888;</TD>
+			   % if commits[0] == commit:
+			   	   <TD class="failedMergeTop" cid="${commit.cid()}">&#9888;</TD>
+			   % else:
+			       <TD class="failedMerge" cid="${commit.cid()}">&#9888;</TD>
+			   % endif
 		    % endif
 	   % elif "{0}".format(commit.cid()) == "{0}".format(head):
   		    <TD class="radio"><input type="radio" name="cid1" value="${commit.cid()}" checked="checked"></TD> 
@@ -87,6 +91,18 @@ $(document).ready(function(){
 		  '<input class="button" type="submit" value="Comment" onclick="submitComment()" /> ' 
 	    );
 	    modal.style.display = "block";	
+	});
+	$("td.failedMergeTop").click(function(){
+		$("#modal-header").html("Failed merge for commit #" + $(this).attr("cid"));
+		
+		$.get("merge", {cid: $(this).attr("cid")}, function(result){
+			$("#modal-body").html(
+		  '<input type="hidden" name="cid" value="'+ $(this).attr("cid") +'"/>'+
+		  'Enter Comment: <input name="comment" type="text" size="40" placeholder="reason to ignore"/><br/>'+
+		  '<input class="button" type="submit" value="Comment" onclick="submitComment()" /><br/> ' + 
+				result);
+		} );	
+		modal.style.display = "block";
 	});
 	$("tr.commits").on('click', 'td:gt(2)' , function(){
 		var parentRow = $(this).parent()
