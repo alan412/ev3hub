@@ -145,6 +145,7 @@ class EV3Project(object):
                 commit = Commit.from_id(self.path, commit.parent());
             else:
                 return  # Can return because if none were found, none will be found for parents either....
+        
     def merge(self, cid):
         data = {};
         errors = [];
@@ -163,9 +164,6 @@ class EV3Project(object):
                 changes_to_head = Changeset(parent_commit, head_commit)
                 changes_to_commit = Changeset(parent_commit, id_commit)                      
                 proposed_head_commit = head_commit;
-    #            print "Head:{0} ID: {1} Parent {2}".format(self.head, cid, parent_cid) 
-    #            print "Changes_to_head:{0}".format(changes_to_head)
-    #            print "Changes_to_commit:{0}".format(changes_to_commit)
           
                 for filename in changes_to_commit.newFiles():
                     if (filename in changes_to_head.newFiles()) and (head_commit.getSHA(filename) != id_commit.getSHA(filename)):   
@@ -178,7 +176,7 @@ class EV3Project(object):
                     else:
                         proposed_head_commit.files()[filename] = id_commit.files()[filename];    
                 for filename in changes_to_commit.removedFiles():
-                    if (filename in changes_to_head.modifiedFiles()):
+                    if (filename not in changes_to_head.modifiedFiles()):
                         proposed_head_commit.remove_file(filename)                    
                 print "Errors: {0}".format(errors)
             
