@@ -57,9 +57,11 @@ class Users(object):
         except:
             pass
     def create_forgot_token(self, username):
-        if self.users[username]['forgot-time'] < (time.time() + 300):   # to keep mspradli from spamming people
-            return ''
-            
+        try:
+            if self.users[username]['forgot-time'] < (time.time() + 300):   # to keep mspradli from spamming people
+                return ''
+        except:
+            pass
         chars='ABCDEFGHJKMNPQRSTUVWXYZ23456789';
         forgotID = ''.join(random.SystemRandom().choice(chars) for _ in range(8))
         try:
