@@ -17,8 +17,6 @@ def getSHA(text):
     m.update(text)
     return m.hexdigest()
     
-
-
 class UserProjects(object):
     def __init__(self, username):
         self.path = os.path.join('data', getSHA(username)) 
@@ -42,9 +40,7 @@ class UserProjects(object):
         self.save();
     def get_project_list(self):
         project_list = []
-        print "Getting project list from {0}".format(self.projects)
         for project in self.projects:
-            print "Project:{0}".format(project)
             updated = os.path.getmtime(os.path.join(self.path, getSHA(project)));
             project_list.append({'name':project, 'Updated': updated })
         return project_list;
@@ -61,18 +57,23 @@ class Users(object):
         except:
             pass
     def create_forgot_token(self, username):
+        if self.users[username]['forgot-time'] < (time.time() + 300):   # to keep mspradli from spamming people
+            return ''
+            
         chars='ABCDEFGHJKMNPQRSTUVWXYZ23456789';
         forgotID = ''.join(random.SystemRandom().choice(chars) for _ in range(8))
         try:
             self.users[username]['forgot'] = pwd_context.hash(forgotID)
+            self.users[username]['forgot-time'] = time.time();
             self.save()
         except:
             forgotID = ''
         return forgotID 
     def verify_forgot(self, username, forgot):
         try:
-            if pwd_context.verify(forgot, self.users[username]['forgot']):
+            if (self.users[username]['forgot-time'] < (time.time() + (60*60*24))) and pwd_context.verify(forgot, self.users[username]['forgot']):
                 self.users[username]['forgot'] = ''   # Don't save because the next step is changing password
+                self.users[username]['forgot-time'] = ''
                 return True;       
         except:
             pass
@@ -143,13 +144,15 @@ class Users(object):
            mail = self.get_email(username);
            if not mail:
               return "No email defined for user:{0}".format(username)
-
+   
            token = self.create_forgot_token(username)
+           if not token:
+              return "Tokens only sent every 5 minutes per user.  Please check your email."
 
            safe_username=urllib.quote_plus(username)
            msg = MIMEText("Please go to http://beta.ev3hub.com/forgot?username=" + safe_username + 
                "&token=" + token + " to reset your password.  If you did not request that you had forgotten " +
-               "your password, then you can safely ignore this e-mail.\n\nThank you,\nThe EV3HUB team");          
+               "your password, then you can safely ignore this e-mail.  This expires in 24 hours.\n\nThank you,\nThe EV3HUB team");          
 
            from_email = 'ev3hub@ev3hub.com';
            msg['To'] = email.utils.formataddr((username, mail))

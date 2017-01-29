@@ -167,7 +167,7 @@ class EV3hub(object):
             else:
                 return "new passwords don't match"
         else:
-           return 'Invalid forgot username/token'            
+           return 'Invalid forgot username/token.  Tokens expire after 24 hours.'            
     @cherrypy.expose
     def logout(self):
         cherrypy.lib.sessions.expire()
