@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <%page expression_filter="x"/>
+<%!
+   import re
+   
+   def escapeName(nameStr):
+      escaped = re.sub(r'([. -])',r'\\\1', nameStr);
+      if escaped[:1].isdigit():
+         escaped = '\\' + escaped
+      return escaped
+%>
 <SourceFile Version="1.0.2.10" xmlns="http://www.ni.com/SourceModel.xsd">
 	<Namespace Name="Default">
 		<Project xmlns="http://www.ni.com/Project.xsd">
@@ -22,18 +31,18 @@
                 <DefinitionReference DocumentTypeIdentifier="NationalInstruments.X3.App.X3FolderLoaderDefinition" Name="vi\.lib_PBR" Bindings="Envoy,DefinitionReference,EmbeddedReference" />
 
 				% for program in programs:
-					<SourceFileReference StoragePath="${program}" RelativeStoragePath="${program}" OverridingDocumentTypeIdentifier="X3VIDocument" DocumentTypeIdentifier="NationalInstruments.LabVIEW.VI.Modeling.VirtualInstrument" Name="${program.replace('.','\\.').replace(' ','\\ ')}">
+					<SourceFileReference StoragePath="${program}" RelativeStoragePath="${program}" OverridingDocumentTypeIdentifier="X3VIDocument" DocumentTypeIdentifier="NationalInstruments.LabVIEW.VI.Modeling.VirtualInstrument" Name="${escapeName(program)}">
 						<X3DocumentSettings ShowFileOnStartup="False" IsTeacherOnlyFile="False" IsHiddenDependency="False" xmlns="http://www.ni.com/X3DocumentSettings.xsd" />
 					</SourceFileReference>
 				% endfor
 				% for myblock in myblockdefs:
-					<SourceFileReference StoragePath="${myblock}" RelativeStoragePath="${myblock}" OverridingDocumentTypeIdentifier="X3VIDocument" DocumentTypeIdentifier="NationalInstruments.LabVIEW.VI.Modeling.VirtualInstrument" Name="${myblock.replace('.','\\.').replace(' ','\\ ')}" Bindings="Envoy,DefinitionReference,SourceFileReference,X3VIDocument" >
+					<SourceFileReference StoragePath="${myblock}" RelativeStoragePath="${myblock}" OverridingDocumentTypeIdentifier="X3VIDocument" DocumentTypeIdentifier="NationalInstruments.LabVIEW.VI.Modeling.VirtualInstrument" Name="${escapeName(myblock)}" Bindings="Envoy,DefinitionReference,SourceFileReference,X3VIDocument" >
 						<X3DocumentSettings ShowFileOnStartup="False" IsTeacherOnlyFile="False" IsHiddenDependency="False" xmlns="http://www.ni.com/X3DocumentSettings.xsd" />
 					</SourceFileReference>
-					<DefinitionReference DocumentTypeIdentifier="NationalInstruments.ExternalFileSupport.Modeling.ExternalFileType" Name="${myblock.replace('.','\\.').replace(' ','\\ ')}\.mbxml" Bindings="Envoy,DefinitionReference,EmbeddedReference,ProjectItemDragDropDefaultService" />
+					<DefinitionReference DocumentTypeIdentifier="NationalInstruments.ExternalFileSupport.Modeling.ExternalFileType" Name="${escapeName(myblock)}\.mbxml" Bindings="Envoy,DefinitionReference,EmbeddedReference,ProjectItemDragDropDefaultService" />
 				% endfor
 				% for media in medias:
-					<DefinitionReference DocumentTypeIdentifier="NationalInstruments.ExternalFileSupport.Modeling.ExternalFileType" Name="${media.replace('.','\\.').replace(' ','\\ ')}" Bindings="Envoy,DefinitionReference,EmbeddedReference,ProjectItemDragDropDefaultService" />
+					<DefinitionReference DocumentTypeIdentifier="NationalInstruments.ExternalFileSupport.Modeling.ExternalFileType" Name="${escapeName(media)}" Bindings="Envoy,DefinitionReference,EmbeddedReference,ProjectItemDragDropDefaultService" />
 				% endfor
 			</Target>
 			<ProjectSettings>
@@ -91,7 +100,7 @@
         </LoaderDefinition>
     </Namespace>
 	% for myblock in myblockdefs:
-		<Namespace Name="${myblock.replace('.','\\.').replace(' ','\\ ')}\.mbxml">
+		<Namespace Name="${escapeName(myblock)}\.mbxml">
 			<ExternalFile xmlns="http://www.ni.com/ExternalFile.xsd">
 				<RelativeStoragePath>${myblock}.mbxml</RelativeStoragePath>
 				<StoragePath></StoragePath>
@@ -99,7 +108,7 @@
 		</Namespace>
 	% endfor
 	% for media in medias:
-		<Namespace Name="${media.replace('.','\\.').replace(' ','\\ ')}">
+		<Namespace Name="${escapeName(media)}">
 	        <ExternalFile xmlns="http://www.ni.com/ExternalFile.xsd">
 	            <RelativeStoragePath>${media}</RelativeStoragePath>
 	            <StoragePath />
