@@ -107,6 +107,10 @@ tr.projects:hover{
 	background-color: #3E606F;
 	cursor: pointer;
 }
+tr.projects td.delete{
+	color: red;
+	text-align: center;
+}
 
 table.commits th, table.details,table.merge th{
 	border-left: 1px solid white;

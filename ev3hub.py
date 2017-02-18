@@ -46,7 +46,7 @@ class EV3hub(object):
     def get_project(self):
         project = Cookie('project').get('')
         username = Cookie('username').get('')
-        return ev3project.EV3Project(project, self.users.get_project_dir(username, project))
+        return self.users.get_project(username, project)
           
     def show_loginpage(self, error=''):
         cherrypy.session.regenerate();      
@@ -63,9 +63,9 @@ class EV3hub(object):
         return self.template("merge.html",project=project, commit = commit, different = different, error = error)
     def show_mainpage(self, username, error=''):
         project = Cookie('project').get("")
-        if not project:
-            return self.projects()
         ev3P = self.get_project()
+        if not ev3P:
+            return self.projects()
         commits = ev3P.getListOfCommits()
         email = self.users.get_email(username)
                    
@@ -185,6 +185,13 @@ class EV3hub(object):
            return self.show_uploadpage(project, username, programmer, host);
         else: 
            return self.projects()    
+    @cherrypy.expose
+    def removeProject(self, project):
+        username = Cookie('username').get('')
+        if self.users.remove_project(username, project):
+            return ''
+        else:
+            return 'Error removing project'
     @cherrypy.expose
     def updateSettings(self, email, newpw1, newpw2, password):
         username = Cookie('username').get('')

@@ -4,11 +4,11 @@
 <H3 align=right>Logged in as ${username}. <A HREF="logout">logout</A></H3>
 
 % if projects:
-Click on project to see that project or fill out the form for a new project.
+Click on project to see that project or fill out the form for a new project or delete lets you remove a project.
 <TABLE class='projects' width="100%" border="1">
-<TR><TH width="50%">Project Name</TH><TH>Last Changed</TH></TR>
+<TR><TH>Delete</TH><TH width="50%">Project Name</TH><TH>Last Changed</TH></TR>
 	% for project in projects:
-		<TR class='projects' onclick="window.location = 'changeProject?project=${project['name']}'"}><TD>${project['name']}</TD><TD class="date">${project['Updated']}</TD></TR>
+		<TR class='projects' project="${project['name']}"><TD class="delete">&#127335;</TD><TD class="name">${project['name']}</TD><TD class="date">${project['Updated']}</TD></TR>
 	% endfor
 </TABLE>
 % else:
@@ -31,3 +31,23 @@ Click on project to see that project or fill out the form for a new project.
 <input class="button project" type="submit" value="Create"/>
 </OL>
 </form>
+<script>
+$(document).ready(function(){
+	$("td.delete").click(function(){
+		var projectName = $(this).parent().attr("project")
+		if (confirm("Delete Project '" + projectName +"'?\nThis CANNOT be undone!!!")){
+			$.post("removeProject", {project: projectName}, function(result){
+				alert("Project '" + projectName + "' deleted");
+				location.reload(true)
+			});
+		};
+	});
+	$("td.name").click(function(){
+		window.location = 'changeProject?project=' + $(this).parent().attr("project");
+	});
+	$("td.date").click(function(){
+		window.location = 'changeProject?project=' + $(this).parent().attr("project");
+	});
+	
+});
+</script>

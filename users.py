@@ -11,6 +11,7 @@ import ev3project
 from email.mime.text import MIMEText
 from operator import itemgetter
 import urllib
+import shutil
 
 def getSHA(text):
     m = hashlib.sha1()
@@ -37,6 +38,9 @@ class UserProjects(object):
                json.dump(self.projects, project_file)
     def add_project(self, projname):
         self.projects[projname] = {}
+        self.save();
+    def remove_project(self, projname):
+        self.projects.pop(projname, None)
         self.save();
     def get_project_list(self):
         project_list = []
@@ -118,14 +122,24 @@ class Users(object):
     def get_user_dir(self, username):
         return getSHA(username)
     def get_project_dir(self, username, project):
-        # This will change to not just using username plus project
         return os.path.join("data", self.get_user_dir(username), getSHA(project))
     def get_project(self, username, project):
-        return ev3project.EV3Project(project, self.get_project_dir(username, project))
+        if not project or not username:
+            return None
+        proj_dir = get_project_dir(username, project)
+        if os.path.exists(path):
+            return ev3project.EV3Project(project, self.get_project_dir(username, project))
+        else:
+            return None
     def new_project(self, username, project, ev3data, who, host):
         up = UserProjects(username)
         ev3project.EV3Project.newProject(project, self.get_project_dir(username, project), ev3data, who, host)
         up.add_project(project)
+    def remove_project(self, username, project):
+        up = UserProjects(username)
+        shutil.rmtree(self.get_project_dir(username, project), True) # ignoring errors because we really don't have anything we can do about it
+        up.remove_project(project)   
+        return True 
     def get_projectlist(self, username):
         up = UserProjects(username);
         projects_dates = up.get_project_list()
