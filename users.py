@@ -126,7 +126,7 @@ class Users(object):
     def get_project(self, username, project):
         if not project or not username:
             return None
-        proj_dir = get_project_dir(username, project)
+        proj_dir = self.get_project_dir(username, project)
         if os.path.exists(path):
             return ev3project.EV3Project(project, self.get_project_dir(username, project))
         else:
