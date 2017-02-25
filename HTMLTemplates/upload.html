@@ -15,11 +15,26 @@ Please enter in all fields.<br/>
 <input type="button" class="button" onclick="uploadData()" value="Upload"/>
 </OL>
 </form>
+<div id="progress-div"><div id="progress-bar"></div></div>
+
 <script>
 function uploadData(){
 	if(($('#input_file').val().length) && ($('#comment').val().length)){
 		var formData = new FormData($('form')[0]);
+		$("#progress-bar").width('0%');
 	    $.ajax({
+			xhr: function(){
+				var xhr = new window.XMLHttpRequest();
+				xhr.upload.addEventListener("progress", function(evt){
+					if (evt.lengthComputable) {
+					    var percentComplete = 100 * (evt.loaded / evt.total);
+						$("#progress-bar").width(percentComplete + '%');
+						$("#progress-bar").html('<div id="progress-status">' + percentComplete +' %</div>');             
+					}
+				}, false);
+				
+				return xhr;
+			},
 	         url: 'uploadDone',  //Server script to process data
 	         type: 'POST',
 	         // Form data

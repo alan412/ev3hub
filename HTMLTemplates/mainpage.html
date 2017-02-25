@@ -78,6 +78,12 @@ var modal = document.getElementById('modal');
 // Get the <span> element that closes the modal
 var span = document.getElementsByClassName("close")[0];
 
+$(document).ajaxStart(function() {
+    $(document.body).css({'cursor' : 'wait'});
+}).ajaxStop(function() {
+    $(document.body).css({'cursor' : 'default'});
+});
+
 $(document).ready(function(){
 	$("td.ignoreFail").click(function(){
 		$("#modal-header").html("Failed merge for commit #" + $(this).attr("cid"));
