@@ -203,6 +203,7 @@ class EV3Project(object):
         return errors;
 
     def merge(self, cid):
+        errors = []
         if not self.head:
             self.head = cid;
         else:    
@@ -211,7 +212,6 @@ class EV3Project(object):
                 self.head = cid; 
             else:
                 (proposed_head_commit, errors_added, errors_modified) = self.try_merge(id_commit)
-                errors = []
                 for filename in errors_added:
                     errors.append("{0} added in both".format(filename))
                 for filename in errors_modified:
