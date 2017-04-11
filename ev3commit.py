@@ -27,8 +27,8 @@ class Commit(object):
       except:
           return ""      
     def remove_file(self, filename):
-      if filename in commitDetails["files"]:
-          del commitDetails["files"][filename];
+      if filename in self.commitDetails["files"]:
+          del self.commitDetails["files"][filename];
     def parent(self):
       return self.commitDetails["parent"];
     def time(self):
