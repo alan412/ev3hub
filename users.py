@@ -102,6 +102,8 @@ class Users(object):
             self.users[username]['email'] = email
             self.save();
     def get(self, username):   # this will return the case version that is in the users list
+        if not username:
+            return ''  # not found
         lower_username = username.lower()
         for key in self.users:
             if key.lower() == lower_username:
