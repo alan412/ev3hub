@@ -190,7 +190,7 @@ div#detailsByDate{
 
 tr.notEquals {background-color: #880000; color: white;}
 tr.onlyOne {color: blue;}
-tr.equals {color: gray;}
+tr.equals {color: gray; display: none;}
 
 td.radio 	   {text-align: center;}
 td.failedMerge,td.failedMergeTop {text-align: center; background-color: #F08080; color: white; cursor: pointer;}
