@@ -106,8 +106,10 @@ class Commit(object):
                         medias.append(filename)
 
             for myblock in myblockdefs:
-                programs.remove(myblock)
-                
+                try:
+                    programs.remove(myblock)
+                except:
+                    pass
             # generate lvprojx.proj file here
             lvprojx_data = ev3_template.render(programs= sorted(programs, key=unicode.lower), 
                                                myblockdefs= sorted(myblockdefs, key=unicode.lower),
