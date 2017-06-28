@@ -9,3 +9,5 @@ sessions/
 *.log
 # For virtual environments
 venv/
+# Keep out local scripts to deal with remote server
+remote/
