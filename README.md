@@ -8,10 +8,8 @@ This is from reverse engineering the EV3 format.  (which could change at any tim
 There is absolutely **NO** promise made that your data will be ok.   It has not been thoroughly tested.
 
 # Known Issues 
-The only known issues at this time.
-
-1. Very little verification and worthless errors
-2. Almost no help file
+All known issues are located here:
+https://github.com/alan412/ev3hub/issues
 
 # To Run
 This is available at http://beta.ev3hub.com
