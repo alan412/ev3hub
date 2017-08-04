@@ -55,10 +55,14 @@ class Commit(object):
         graph.graph_attr.update(ranksep='2', ratio='compress',size='7.5,10')
         graph.node_attr.update(fontname='Arial', fontsize='30')
         for filename in self.files():
-            if filename.endswith(".ev3p"):
+             if filename.endswith(".ev3p"):
+                testProgram = False;
                 callee = filename[:-5]  # strip off the .ev3p
                 if callee.startswith("M_"):
                     graph.add_node(callee, style='filled', fillcolor='gray')
+                elif (callee[:4].lower() == 'test'):
+                    graph.add_node(callee, style='dotted', fontcolor='gray', layer='test')
+                    testProgram = True;
                 else:
                     graph.add_node(callee)   
                 repo_filename = os.path.join(self.path, "repo", self.files()[filename])
@@ -67,7 +71,10 @@ class Commit(object):
                         if line.find('.ev3p') != -1:
                            begin = line.find('Target') + 8
                            end = line.find('\\.ev3p')
-                           graph.add_edge(callee, line[begin:end])
+                           if testProgram:
+                               graph.add_edge(callee, line[begin:end], style='dotted')
+                           else:
+                               graph.add_edge(callee, line[begin:end])
         imgbuf = cStringIO.StringIO()
         graph.draw(imgbuf, format='svg',prog='dot')
         return imgbuf.getvalue();

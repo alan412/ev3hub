@@ -42,5 +42,8 @@ $("#downloadCommit").click(function(){
 </TABLE>
 </DIV>
 <H1>Call Graph</H1>
-<P>This shows every program and what MyBlocks it calls (and MyBlocks they call and so on).  If you title a program starting with "M_" then it will show up as solid gray.  (FLL #447 uses this convention for missions.)</P>
+<P>This shows every program and what MyBlocks it includes (and MyBlocks they include and so on).</P>
+<UL><LI>If you title a program starting with "M_" then it will show up as solid gray.  (FLL #447 uses this convention for missions.)</LI>
+<LI>If you title a program starting with "test" then it will have a dotted edge and gray text.</LI>
+</UL>
 <CENTER><IMG WIDTH="95%" TITLE="${project}-#${commit.cid()} call graph" SRC="graph?cid=${commit.cid()}" ALT="program call graph"/></CENTER>
