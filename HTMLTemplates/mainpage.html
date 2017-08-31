@@ -7,7 +7,7 @@
 
 <div class="top">
 	<div class="project">
-	    <button id="projBtn" class="button">Project: ${project}</button>
+	    <button title="Click to change project" id="projBtn" class="button">&#127968; Project: ${project}</button>
 	</div>
 	<div class="title">
 		<IMG class="logo" height=60px src="static/splash.png"/>
@@ -15,12 +15,12 @@
 		<IMG class="logo" height=60px src="static/splash.png"/>
 	</div>
 	<div class="dropdown">
-	  <button class="button">Logged in: ${username}</button>	  
+	  <button class="button">Logged in: ${username}</button>
 	  <div class="dropdown-content">
 		<p id="settings">Account Settings</p>
 	    <p id="logout">Logout</p>
 	  </div>
-	</div>	
+	</div>
 </div>
 
 <TABLE class=spacing width="100%">
@@ -39,8 +39,8 @@
 <TR><TH class="radiodiff">1</TH><TH class="radiodiff">2</TH><TH class="symbol"</TH><TH class="cid">id</TH><TH class="cid">from</TH><TH class="comments">Comments</TH><TH class="time">Date / Time</TH><TH class="who">Who</TH><TH class="host">Host</TH></TR>
 	% for commit in commits:
 	      <TR class="commits" cid="${commit.cid()}" comment="${commit.comment()}">
-	   % if "{0}".format(commit.cid()) in failedMerges: 
-  		    <TD class="radio"><input type="radio" name="cid1" value="${commit.cid()}"></TD> 
+	   % if "{0}".format(commit.cid()) in failedMerges:
+  		    <TD class="radio"><input type="radio" name="cid1" value="${commit.cid()}"></TD>
   			<TD class="radio"><input type="radio" name="cid2" value="${commit.cid()}"></TD>
 	        % if failedMerges["{0}".format(commit.cid())]:
 			   <TD class="ignoreFail" cid="${commit.cid()}" comment="${failedMerges["{0}".format(commit.cid())]}">&#9888;</TD>
@@ -52,22 +52,22 @@
 			   % endif
 		    % endif
 	   % elif "{0}".format(commit.cid()) == "{0}".format(head):
-  		    <TD class="radio"><input type="radio" name="cid1" value="${commit.cid()}" checked="checked"></TD> 
+  		    <TD class="radio"><input type="radio" name="cid1" value="${commit.cid()}" checked="checked"></TD>
   			<TD class="radio"><input type="radio" name="cid2" value="${commit.cid()}" checked="checked"></TD>
 			<TD class="head">&#10144;</TD>
 	   % else:
-  		    <TD class="radio"><input type="radio" name="cid1" value="${commit.cid()}"></TD> 
+  		    <TD class="radio"><input type="radio" name="cid1" value="${commit.cid()}"></TD>
   			<TD class="radio"><input type="radio" name="cid2" value="${commit.cid()}"></TD>
 			<TD class="merged">&checkmark;</TD>
 	   % endif
-			<TD class="id" cid="${commit.cid()}">${commit.cid()}</TD></A> 
+			<TD class="id" cid="${commit.cid()}">${commit.cid()}</TD></A>
 			<TD class="parent">${commit.parent()}</TD>
-			<TD>${commit.comment()}</TD> 
+			<TD>${commit.comment()}</TD>
 			<TD class="date">${commit.time()}</TD>
-			<TD>${commit.name()}</TD> 
+			<TD>${commit.name()}</TD>
 			<TD>${commit.host()}</TD> </TR>
 	% endfor
-</TABLE>	
+</TABLE>
 <div class="help">
 	<button id="helpBtn" class="button">Explain this to me</button>
 </div>
@@ -88,26 +88,26 @@ $(document).ready(function(){
 	$("td.ignoreFail").click(function(){
 		$("#modal-header").html("Failed merge for commit #" + $(this).attr("cid"));
 		$("#modal-body").html("Comment: " + $(this).attr("comment"));
-		modal.style.display = "block";	
+		modal.style.display = "block";
 	});
 	$("td.failedMerge").click(function(){
 		$("#modal-header").html("Failed merge for commit #" + $(this).attr("cid"));
 		$("#modal-body").html('<input type="hidden" name="cid" value="'+ $(this).attr("cid") +'"/>'+
 		  'Enter Comment: <input name="comment" type="text" size="40" placeholder="reason to ignore"/><br/>'+
-		  '<input class="button" type="submit" value="Comment" onclick="submitComment()" /> ' 
+		  '<input class="button" type="submit" value="Comment" onclick="submitComment()" /> '
 	    );
-	    modal.style.display = "block";	
+	    modal.style.display = "block";
 	});
 	$("td.failedMergeTop").click(function(){
 		$("#modal-header").html("Failed merge for commit #" + $(this).attr("cid"));
-		
+
 		$.get("merge", {cid: $(this).attr("cid")}, function(result){
 			$("#modal-body").html(
 		  '<input type="hidden" name="cid" value="'+ $(this).attr("cid") +'"/>'+
 		  'Enter Comment: <input name="comment" type="text" size="40" placeholder="reason to ignore"/><br/>'+
-		  '<input class="button" type="submit" value="Comment" onclick="submitComment()" /><br/> ' + 
+		  '<input class="button" type="submit" value="Comment" onclick="submitComment()" /><br/> ' +
 				result);
-		} );	
+		} );
 		modal.style.display = "block";
 	});
 	$("tr.commits").on('click', 'td:gt(2)' , function(){
@@ -116,10 +116,10 @@ $(document).ready(function(){
 		$.post("details", {cid: parentRow.attr("cid")}, function(result){
 			$("#modal-body").html(result);
 			$("#modal-body .date").each(function(){
-				$( this ).text(pythonDatetimeToHTML($(this).text()));		   	
+				$( this ).text(pythonDatetimeToHTML($(this).text()));
 			});
 		} );
-		modal.style.display = "block";			
+		modal.style.display = "block";
 	});
 });
 
@@ -127,9 +127,9 @@ $(document).ready(function(){
 function submitComment(){
 	var cid_val = $("input[name=cid]").val();
 	var comment_val = $("input[name=comment]").val();
-	
+
 	$.post("ignoreFailedMerge", {cid : cid_val, comment : comment_val}, function(result){
-		window.location.assign(location.origin); 
+		window.location.assign(location.origin);
 	});
 };
 
@@ -145,7 +145,7 @@ var helpBtn = document.getElementById("helpBtn");
 
 helpBtn.onclick = function(){
 	$("#modal-header").html("Explain this to me");
-	
+
 	$("#modal-body").html(
 	"<H1>Background</H1>"+
 	"<p>The EV3 file is in reality a zip file with each program and myblock as individual files within it.</p>"+
@@ -172,7 +172,7 @@ helpBtn.onclick = function(){
 	"<LI>If it exists, it looks to see what changes have been made.   If a program hasn't been changed in two different commits from the same place, then it merges them.</LI>"+
 	"<LI>So imagine that two different students both download commit #1.   Each of them creates a different new program - DriveToLine and DriveCentimeters.  They each upload, and ev3hub creates a new commit that has both programs in it."
 	);
-    modal.style.display = "block";		
+    modal.style.display = "block";
 }
 
 upload.onclick = function() {
@@ -180,7 +180,7 @@ upload.onclick = function() {
 	$.get("upload", function(result){
 		$("#modal-body").html(result);
 	} );
-    modal.style.display = "block";	
+    modal.style.display = "block";
 }
 
 download.onclick = function(){
@@ -191,20 +191,20 @@ projectBtn.onclick = function(){
 	window.location = "projects"
 }
 
-// When the user clicks on the button, open the modal 
+// When the user clicks on the button, open the modal
 diffBtn.onclick = function() {
 	$("#modal-header").html("Diff - ${project}");
-	
+
 	var cid1_val = $("input[name=cid1]:checked").val();
 	var cid2_val = $("input[name=cid2]:checked").val();
 
 	$.post("diff", {cid1: cid1_val, cid2:cid2_val}, function(result){
 		$("#modal-body").html(result);
 		$("#modal-body .date").each(function(){
-			$( this ).text(pythonDatetimeToHTML($(this).text()));		   	
+			$( this ).text(pythonDatetimeToHTML($(this).text()));
 		});
 	} );
-	
+
     modal.style.display = "block";
 }
 
@@ -225,7 +225,7 @@ settings.onclick = function(){
 '<tr><td>New Password (again):</td><td><input type="password" name="newPassword2"  placeholder="new password" /></td></tr>'+
 '<tr><td>Current Password:</td><td><input type="password" name="password" placeholder="current password"></td></tr>'+
 "</table>"+
-'<br/><input type="submit" onclick="updateSettings()" value="Update"/>'		
+'<br/><input type="submit" onclick="updateSettings()" value="Update"/>'
 	);
 	modal.style.display = "block";
 }
@@ -235,15 +235,15 @@ function updateSettings(){
 	var newpw1_val = $("input[name=newPassword]").val();
 	var newpw2_val = $("input[name=newPassword2]").val();
 	var pw_val = $("input[name=password]").val();
-			
+
 	$.post("updateSettings", {email: email_val, newpw1 : newpw1_val, newpw2 : newpw2_val, password : pw_val}, function(result){
-		if (!$.trim(result)){   
+		if (!$.trim(result)){
 		    modal.style.display = "none"; // everything is good :-)
 			if(email_val){
 				email_start_val = email_val;
 			}
 		}
-		else{   
+		else{
 		    alert(result);
 		}
 	});
