@@ -16,7 +16,7 @@ function createTag(){
 };
 
 $("td.delete").click(function(){
-  var tagName = $(this).parent().attr("tag")
+  var tagName = escapeHTML($(this).parent().attr("tag"))
   if (confirm("Delete tag '" + tagName +"'?\nThis CANNOT be undone!!!")){
     $.post("removeTag", {tag: tagName}, function(result){
       alert("Tag '" + tagName + "' deleted");
