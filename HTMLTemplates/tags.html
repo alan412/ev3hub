@@ -29,7 +29,7 @@ $("td.delete").click(function(){
 
 $("tr.tags").on('click', 'td:gt(0)' , function(){
 		var parentRow = $(this).parent();
-		$("#modal-header").html("Details for tag: " + parentRow.attr("tag") + " (" + parentRow.attr("cid") + ")");
+		$("#modal-header").html("Details for tag: " + escapeHTML(parentRow.attr("tag")) + " (" + parentRow.attr("cid") + ")");
 		$.post("details", {cid: parentRow.attr("cid")}, function(result){
 			$("#modal-body").html(result);
 			$("#modal-body .date").each(function(){
