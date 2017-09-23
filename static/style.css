@@ -34,13 +34,13 @@ p.title{
 }
 
 .button {
-    background-color: #3E606F;  
+    background-color: #3E606F;
     color: white;
     padding: 10px 20px;
     font-size: 16px;
     border: none;
 	border-radius: 15px;
-    cursor: pointer;	
+    cursor: pointer;
 }
 
 div.project {
@@ -107,7 +107,7 @@ tr.projects:hover{
 	background-color: #3E606F;
 	cursor: pointer;
 }
-tr.projects td.delete{
+td.delete{
 	color: red;
 	text-align: center;
 }
@@ -171,7 +171,7 @@ table.diff{
 	border-collapse:collapse;
 	padding: 5px;
 	margin: 20px;
-    margin-left:auto; 
+    margin-left:auto;
     margin-right:auto;
 }
 td.compare{
@@ -187,6 +187,11 @@ div#detailsByDate{
 	display: none;
 }
 
+table.tags tr:nth-child(even) {background-color: #f2f2f2; }
+table.tags tr:hover{
+	background-color: #3E606F;
+	cursor: pointer;
+}
 
 tr.notEquals {background-color: #880000; color: white;}
 tr.onlyOne {color: blue;}
@@ -233,7 +238,7 @@ th {
 .modal-content {
 	position: relative;
     background-color: #FCFFF5;
-    margin: auto; 
+    margin: auto;
     padding: 0;
     border: 1px solid #888;
     width: 80%; /* Could be more or less, depending on screen size */

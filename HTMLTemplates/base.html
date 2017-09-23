@@ -5,13 +5,19 @@ ${self.scripts()}
 <script>
 function pythonDatetimeToHTML(datetime){
 	var js_datetime = new Date(datetime * 1000);
-	var options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName : 'short'}
+	var options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName : 'short'};
 	return js_datetime.toLocaleString("en-US", options);
 }
+function pythonDateToHTML(datetime){
+	var js_datetime = new Date(datetime * 1000);
+	var options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric'};
+	return js_datetime.toLocaleString("en-US", options);
+}
+
 $( document ).ready(function(){
 	$(".date").each(function(){
 		$( this ).text(pythonDatetimeToHTML($(this).text()));
-	});	
+	});
 });
 var entityMap = {
   "&": "&amp;",
@@ -36,7 +42,7 @@ function escapeHTML(string) {
     <body>
 % if error is not UNDEFINED:
 	    <H1 class="error" id="error">${error}</H1>
-% endif		
+% endif
 <div id="modal" class="modal">
 	<div class="modal-content">
 		<div class="modal-header">

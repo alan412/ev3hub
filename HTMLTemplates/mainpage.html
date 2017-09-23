@@ -32,8 +32,15 @@
 <TD with="5%"/>
 </TR>
 </TABLE>
-<button id="diffBtn" class="button">Show Diff</button>
-
+<TABLE class=spacing width="100%">
+<TR>
+<TD><button id="diffBtn" class="button">Show Diff</button></TD>
+<TD width="80%"/>
+<TD>
+<button id="tagsBtn" class="button">Tags</button>
+</TD>
+</TR>
+</TABLE>
 
 <TABLE class="commits" width="100%">
 <TR><TH class="radiodiff">1</TH><TH class="radiodiff">2</TH><TH class="symbol"</TH><TH class="cid">id</TH><TH class="cid">from</TH><TH class="comments">Comments</TH><TH class="time">Date / Time</TH><TH class="who">Who</TH><TH class="host">Host</TH></TR>
@@ -135,6 +142,7 @@ function submitComment(){
 
 // Get the button that opens the modal
 var diffBtn = document.getElementById("diffBtn");
+var tagsBtn = document.getElementById("tagsBtn");
 
 var settings = document.getElementById("settings");
 var logout = document.getElementById("logout");
@@ -208,6 +216,20 @@ diffBtn.onclick = function() {
     modal.style.display = "block";
 }
 
+tagsBtn.onclick = function(){
+	$("#modal-header").html("Tags");
+
+	$.get("tags", function(result){
+		$("#modal-body").html(result);
+		$("#modal-body .date").each(function(){
+			$( this ).text(pythonDateToHTML($(this).text()));
+		});
+		$("#modal-body .commitOption").each(function(){
+			$( this ).text(pythonDateToHTML($( this ).attr("Date")) + ': ' + $(this).text());
+		});
+	} );
+  modal.style.display = "block";
+}
 
 
 logout.onclick = function(){
