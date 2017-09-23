@@ -5,7 +5,7 @@ function createTag(){
 
   $.post("createTag", {cid : cid_val, description : comment_val}, function(result){
      if(result){
-        alert("Tags must be unique!");
+        alert(result);
         $("input[name=description]").val("");
      }
      else{
@@ -44,7 +44,7 @@ $("tr.tags").on('click', 'td:gt(0)' , function(){
 % if project.tags:
   <TABLE class="tags" width="100%">
   <TR><TH>Delete</TH><TH width="15%">Date</TH><TH width="75%">Tag</TH></TR>
-  % for tag in project.tags:
+  % for tag in project.listTags():
      <TR class="tags" cid="${project.tags[tag]}" tag="${tag}">
      <TD class="delete">&#127335;</TD><TD class="date">${project.fromTag(tag).time()}</TD><TD>${tag}</TD></TR>
   % endfor

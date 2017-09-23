@@ -3,6 +3,7 @@ import os
 import time
 import sys
 import argparse
+import collections
 from operator import methodcaller
 from ev3commit import Commit, Changeset
 
@@ -38,8 +39,9 @@ class EV3Project(object):
         return '{0} not in failed merge list'.format(cid)
 
     def addTag(self, cid, description):
-        print "Adding tag: " + cid + " - " + description
         clean = description.strip()
+        if not clean:
+            return 'tags must not be empty'
         for tag in self.tags:
             if (tag == clean):
                 return tag + ' already assigned'
@@ -62,6 +64,8 @@ class EV3Project(object):
             if (tag == clean):
               return self.getCommit(self.tags[tag])
         return nil
+    def listTags(self):
+        return collections.OrderedDict(sorted(self.tags.items(), key=lambda t: t[1], reverse=True));
 
     def fullpath(self, filename):
         return os.path.join(self.path, filename)
