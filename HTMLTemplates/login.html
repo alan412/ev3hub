@@ -4,36 +4,53 @@
 
 <br/>
 <table width="100%">
-  <tr><td width="50%"><center>
-  <img src='/static/splash.svg' width="450px">
-</center></td><td>
-  <br/><br/>
-<h3>Login to EV3HUB </h3>
-<table><tr>
-<td>
-  <br/>
-  <form method="post" action="login">   
-    <input type="text" name="username" placeholder="Login Name" style="border:1px solid #333333; padding: 2px; margin:4px;"/>
-    <br/><input type="password" name="password"  placeholder="Password" style="border:1px solid #333333; padding: 2px; margin:4px;"/>
-    <br/><input class="button" type="submit" value="Login" action="login"/>
-  </form>
-</td>
-<td style="vertical-align:middle"><H1>OR <button class="button" id="createBtn">Create Account</button></H1></td></tr></table>
-  <br/><br/><button class="button" id="forgotBtn">Forgot Password</button>
-  </td></tr></table>
+  <tr>
+    <td width="50%">
+      <center>
+        <img src='/static/splash.svg' width="450px">
+      </center>
+    </td>
+    <td>
+      <br/><br/>
+      <h3>Login to EV3HUB </h3>
+      <table>
+        <tr>
+          <td>
+            <br/>
+            <form method="post" action="login">
+              <input type="text" name="username" placeholder="Login Name" style="border:1px solid #333333; padding: 2px; margin:4px;" />
+              <br/><input type="password" name="password" placeholder="Password" style="border:1px solid #333333; padding: 2px; margin:4px;" />
+              <br/><input class="button" type="submit" value="Login" action="login" />
+            </form>
+          </td>
+          <td style="vertical-align:middle">
+            <H1>OR <button class="button" id="createBtn">Create Account</button></H1>
+          </td>
+        </tr>
+      </table>
+      <table>
+        <tr>
+          <td>
+            <br/><br/><button class="button" id="forgotBtn">Forgot Password</button>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
 <script>
   // Get the modal
   var modal = document.getElementById('modal');
 
   // Get the <span> element that closes the modal
   var span = document.getElementsByClassName("close")[0];
-  
+
   // Get the button that opens the modal
   var createAccountBtn = document.getElementById("createBtn");
-  
-  // When the user clicks on the button, open the modal 
+
+  // When the user clicks on the button, open the modal
   createAccountBtn.onclick = function() {
-	$("#error").html = ''  
+	$("#error").html = ''
   	$("#modal-header").html("Create Account");
 
   	$("#modal-body").html("<P>The username is shared with your whole team (or group) so we recommend something like your FLL team number, i.e. FLL447</P>"+
@@ -47,11 +64,11 @@
 		'<input class="button" type="submit" onclick="createAccount()" value="Create"/>'
 	);
     modal.style.display = "block";
-  }  
+  }
   var forgottenBtn = document.getElementById("forgotBtn")
-  
+
   forgottenBtn.onclick = function(){
-    	$("#modal-header").html("Forgot Password");	
+    	$("#modal-header").html("Forgot Password");
 	  	$("#modal-body").html('<p>Enter in your login id.   A reset password link will be emailed to the email with the login.</p>'+
 							  "<p>If you haven't received it in five minutes, please check your spam folder.</p>"+
 							  'Login:<input type="text" name="username" placeholder="Login Name"/>'+
@@ -59,31 +76,31 @@
 		);
 		modal.style.display = "block";
   }
-  
+
   function forgotPassword(){
     	var username_val = $("input[name=username]").val();
 
 	  	$.post("forgotPass", {username : username_val}, function(result){
-	  		if (!$.trim(result)){   
+	  		if (!$.trim(result)){
 	  		    modal.style.display = "none"; // everything is good :-)
 	  		}
-	  		else{   
+	  		else{
 	  		    alert("Error: " + result);
 	  		}
 	  	});
   }
-  
+
   function createAccount(){
 	  var username_val = $("input[name=username]").val();
   	  var email_val = $("input[name=email]").val();
   	  var newpw1_val = $("input[name=password]").val();
   	  var newpw2_val = $("input[name=password2]").val();
- 			
+
   	$.post("createUser", {email: email_val, password : newpw1_val, password2 : newpw2_val, username : username_val}, function(result){
-  		if (result.startsWith("Error:")){   
+  		if (result.startsWith("Error:")){
   		    alert(result);
   		}
-  		else{   
+  		else{
   		    $("#error").html(escapeHTML(result));
 			modal.style.display = "none"; // everything is good :-)
   		}
