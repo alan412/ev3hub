@@ -68,6 +68,7 @@ class EV3hub(object):
         ev3P = self.get_project()
         if not ev3P:
             return self.projects()
+        project = ev3P.name;
         commits = ev3P.getListOfCommits()
         email = self.users.get_email(username)
 

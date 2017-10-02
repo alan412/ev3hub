@@ -126,8 +126,16 @@ class Users(object):
     def get_project_dir(self, username, project):
         return os.path.join("data", self.get_user_dir(username), getSHA(project))
     def get_project(self, username, project):
-        if not project or not username:
+        if not username:
             return None
+        if not project:
+            try:
+               project_list = self.get_projectlist(username);
+               project_item = project_list[0]
+               project_name = project_item['name']
+               project = self.get_projectlist(username)[0]['name']
+            except:
+               return None
         proj_dir = self.get_project_dir(username, project)
         if os.path.exists(proj_dir):
             return ev3project.EV3Project(project, self.get_project_dir(username, project))
