@@ -189,12 +189,16 @@ class EV3hub(object):
         else:
            return self.projects()
     @cherrypy.expose
-    def removeProject(self, project):
+    def removeProject(self, project, password):
         username = Cookie('username').get('')
-        if self.users.remove_project(username, project):
-            return ''
+        print 'Trying'
+        if self.users.verify_password(username, password):
+            if self.users.remove_project(username, project):
+                return 'Project "' + project +'" deleted'
+            else:
+                return 'Error removing project'
         else:
-            return 'Error removing project'
+            return 'Incorrect password'
     @cherrypy.expose
     def updateSettings(self, email, newpw1, newpw2, password):
         username = Cookie('username').get('')

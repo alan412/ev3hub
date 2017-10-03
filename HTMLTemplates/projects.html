@@ -35,9 +35,10 @@ Click on project to see that project or fill out the form for a new project or d
 $(document).ready(function(){
 	$("td.delete").click(function(){
 		var projectName = $(this).parent().attr("project")
-		if (confirm("Delete Project '" + projectName +"'?\nThis CANNOT be undone!!!")){
-			$.post("removeProject", {project: projectName}, function(result){
-				alert("Project '" + projectName + "' deleted");
+		password = prompt("To delete project '" + projectName +"', you need to enter your password.\nThis CANNOT be undone!!!", "password")
+		if (password){
+			$.post("removeProject", {project: projectName, password: password}, function(result){
+				alert(result);
 				location.reload(true)
 			});
 		};
@@ -48,6 +49,6 @@ $(document).ready(function(){
 	$("td.date").click(function(){
 		window.location = 'changeProject?project=' + $(this).parent().attr("project");
 	});
-	
+
 });
 </script>
