@@ -46,7 +46,10 @@ class EV3hub(object):
     def get_project(self):
         project = Cookie('project').get('')
         username = Cookie('username').get('')
-        return self.users.get_project(username, project)
+        ev3p = self.users.get_project(username, project)
+        if ev3p:
+            Cookie('project').set(ev3p.name)
+        return ev3p 
 
     def show_loginpage(self, error=''):
         cherrypy.session.regenerate();
