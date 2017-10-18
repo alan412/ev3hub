@@ -52,8 +52,9 @@ class Commit(object):
            self.path = ''
     def graph(self):
         graph = pygraphviz.AGraph()
-        graph.graph_attr.update(ranksep='2', ratio='compress',size='7.5,10')
+        graph.graph_attr.update(ranksep='2', ratio='compress',size='7.75,10.25')
         graph.node_attr.update(fontname='Arial', fontsize='30')
+        tests = [];
         for filename in self.files():
              if filename.endswith(".ev3p"):
                 testProgram = False;
@@ -61,7 +62,8 @@ class Commit(object):
                 if callee.startswith("M_"):
                     graph.add_node(callee, style='filled', fillcolor='gray')
                 elif (callee[:4].lower() == 'test'):
-                    graph.add_node(callee, style='dotted', fontcolor='gray', layer='test')
+                    node = graph.add_node(callee, style='dotted', fontcolor='gray', layer='test')
+                    tests.append(callee);           
                     testProgram = True;
                 else:
                     graph.add_node(callee)   
@@ -72,11 +74,14 @@ class Commit(object):
                            begin = line.find('Target') + 8
                            end = line.find('\\.ev3p')
                            if testProgram:
-                               graph.add_edge(callee, line[begin:end], style='dotted')
+                               graph.add_edge(callee, line[begin:end], style='dotted', weight=1,color='gray')
                            else:
-                               graph.add_edge(callee, line[begin:end])
+                               graph.add_edge(callee, line[begin:end], weight=10)
         imgbuf = cStringIO.StringIO()
+	graph.subgraph(nbunch=tests, name="cluster_tests",style="invis"); 
         graph.draw(imgbuf, format='svg',prog='dot')
+#        with open(self.filename + ".dot", "w") as outfile:
+#              outfile.write(graph.to_string());      
         return imgbuf.getvalue();
     def get_ev3_data(self, projName):
         variables = {}
