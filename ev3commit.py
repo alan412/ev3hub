@@ -52,7 +52,7 @@ class Commit(object):
            self.path = ''
     def graph(self):
         graph = pygraphviz.AGraph()
-        graph.graph_attr.update(ranksep='2', ratio='compress',size='7.75,10.25')
+        graph.graph_attr.update(ranksep='2', ratio='compress',size='10.25,7.75')
         graph.node_attr.update(fontname='Arial', fontsize='30')
         tests = [];
         for filename in self.files():
@@ -62,7 +62,7 @@ class Commit(object):
                 if callee.startswith("M_"):
                     graph.add_node(callee, style='filled', fillcolor='gray')
                 elif (callee[:4].lower() == 'test'):
-                    node = graph.add_node(callee, style='dotted', fontcolor='gray', layer='test')
+                    graph.add_node(callee, style='dotted', fontcolor='gray', layer='test')
                     tests.append(callee);           
                     testProgram = True;
                 else:
@@ -76,7 +76,7 @@ class Commit(object):
                            if testProgram:
                                graph.add_edge(callee, line[begin:end], style='dotted', weight=1,color='gray')
                            else:
-                               graph.add_edge(callee, line[begin:end], weight=10)
+                               graph.add_edge(callee, line[begin:end], penwidth=3, weight=10)
         imgbuf = cStringIO.StringIO()
 	graph.subgraph(nbunch=tests, name="cluster_tests",style="invis"); 
         graph.draw(imgbuf, format='svg',prog='dot')
