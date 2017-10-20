@@ -161,8 +161,11 @@ class Users(object):
         return sorted(projects_dates, key=itemgetter('Updated'), reverse=True)    
     def rename_project(self, username, oldName, newName): 
         path = self.get_project_dir(username, oldName)
+        newPath = self.get_project_dir(username, newName)
+        if os.path.exists(newPath):   # Already a project by this name, don't allow duplicates
+           return False
         if os.path.exists(path):
-           os.rename(path, self.get_project_dir(username, newName))        
+           os.rename(path, newPath)        
         up = UserProjects(username);
         up.rename_project(oldName, newName);
         return True 
