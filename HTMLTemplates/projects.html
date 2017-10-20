@@ -6,9 +6,9 @@
 % if projects:
 Click on project to see that project or fill out the form for a new project or delete lets you remove a project.
 <TABLE class='projects' width="100%" border="1">
-<TR><TH>Delete</TH><TH width="50%">Project Name</TH><TH>Last Changed</TH></TR>
+<TR><TH>Delete</TH><TH>Rename</TH><TH width="50%">Project Name</TH><TH>Last Changed</TH></TR>
 	% for project in projects:
-		<TR class='projects' project="${project['name']}"><TD class="delete">&#127335;</TD><TD class="name">${project['name']}</TD><TD class="date">${project['Updated']}</TD></TR>
+		<TR class='projects' project="${project['name']}"><TD class="delete">&#127335;</TD><TD class="rename">&#9998;</TD><TD class="name">${project['name']}</TD><TD class="date">${project['Updated']}</TD></TR>
 	% endfor
 </TABLE>
 % else:
@@ -43,6 +43,16 @@ $(document).ready(function(){
 			});
 		};
 	});
+        $("td.rename").click(function(){
+               var oldName = $(this).parent().attr("project")
+               newName = prompt("Enter new name for project: " + oldName, "newName")
+               if(newName){
+                     $.post("renameProject", {project: oldName, newName: newName}, function(result){
+                         alert(result);
+                         location.reload(true);
+                     });
+               };
+         });
 	$("td.name").click(function(){
 		window.location = 'changeProject?project=' + $(this).parent().attr("project");
 	});

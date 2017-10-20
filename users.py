@@ -42,6 +42,10 @@ class UserProjects(object):
     def remove_project(self, projname):
         self.projects.pop(projname, None)
         self.save();
+    def rename_project(self, oldName, newName):
+        self.projects.pop(oldName, None);
+        self.projects[newName] = {}
+        self.save();
     def get_project_list(self):
         project_list = []
         for project in self.projects:
@@ -155,6 +159,13 @@ class Users(object):
         projects_dates = up.get_project_list()
         
         return sorted(projects_dates, key=itemgetter('Updated'), reverse=True)    
+    def rename_project(self, username, oldName, newName): 
+        path = self.get_project_dir(username, oldName)
+        if os.path.exists(path):
+           os.rename(path, self.get_project_dir(username, newName))        
+        up = UserProjects(username);
+        up.rename_project(oldName, newName);
+         
     def project_exists(self, username, project):
         path = self.get_project_dir(username, project)
         if os.path.exists(path):
