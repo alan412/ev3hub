@@ -165,7 +165,7 @@ class Users(object):
            os.rename(path, self.get_project_dir(username, newName))        
         up = UserProjects(username);
         up.rename_project(oldName, newName);
-         
+        return True 
     def project_exists(self, username, project):
         path = self.get_project_dir(username, project)
         if os.path.exists(path):

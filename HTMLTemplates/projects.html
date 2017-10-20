@@ -4,9 +4,11 @@
 <H3 align=right>Logged in as ${username}. <A HREF="logout">logout</A></H3>
 
 % if projects:
-Click on project to see that project or fill out the form for a new project or delete lets you remove a project.
+Click on project to see that project or fill out the form for a new project.<br/>
+Delete lets you remove a project.<br/>
+Rename lets you rename a project.<br/>
 <TABLE class='projects' width="100%" border="1">
-<TR><TH>Delete</TH><TH>Rename</TH><TH width="50%">Project Name</TH><TH>Last Changed</TH></TR>
+<TR><TH width="5%">Delete</TH><TH width="5%">Rename</TH><TH width="50%">Project Name</TH><TH>Last Changed</TH></TR>
 	% for project in projects:
 		<TR class='projects' project="${project['name']}"><TD class="delete">&#127335;</TD><TD class="rename">&#9998;</TD><TD class="name">${project['name']}</TD><TD class="date">${project['Updated']}</TD></TR>
 	% endfor

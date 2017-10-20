@@ -112,6 +112,10 @@ td.delete{
 	text-align: center;
 }
 
+td.rename{
+        text-align: center;
+}
+
 table.commits th, table.details,table.merge th{
 	border-left: 1px solid white;
 	border-right: 1px solid white;
