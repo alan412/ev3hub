@@ -10,7 +10,10 @@ $("#showDateBtn").click(function(){
 $("#downloadCommit").click(function(){
 	window.location = "download?cid=${commit.cid()}"
 })
-
+$("#graph").click(function(){
+  $("#modal-header").html("graph for ${project}-#${commit.cid()}");
+  $("#modal-body").html('<IMG WIDTH="95%" TITLE="${project}-#${commit.cid()} call graph" SRC="graph?cid=${commit.cid()}" ALT="program call graph for ${project}-#${commit.cid()}"/>');
+})
 </script>
 <CENTER><P class="button" id="downloadCommit">&darr; Download this commit &darr;</P></CENTER>
 <H1>Last Program Changes</H1>
@@ -46,4 +49,5 @@ $("#downloadCommit").click(function(){
 <UL><LI>If you title a program starting with "M_" then it will show up as solid gray.  (FLL #447 uses this convention for missions.)</LI>
 <LI>If you title a program starting with "test" then it will have a dotted edge and gray text.</LI>
 </UL>
-<CENTER><IMG WIDTH="95%" TITLE="${project}-#${commit.cid()} call graph" SRC="graph?cid=${commit.cid()}" ALT="program call graph"/></CENTER>
+<CENTER><IMG id="graph"
+  WIDTH="95%" TITLE="${project}-#${commit.cid()} call graph" SRC="graph?cid=${commit.cid()}" ALT="program call graph for ${project}-#${commit.cid()}"/></CENTER>
