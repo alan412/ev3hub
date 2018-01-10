@@ -222,10 +222,11 @@ class EV3hub(object):
         else:
            return 'Password was incorrect'
     @cherrypy.expose
-    def graph(self, cid):
+    def graph(self, cid, showTest=False):
+        print showTest
         ev3P = self.get_project()
         cherrypy.response.headers['Content-Type'] = 'image/svg+xml'
-        return ev3P.graph(cid)
+        return ev3P.graph(cid,showTest)
 
     @cherrypy.expose
     def merge(self, cid):

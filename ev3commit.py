@@ -50,7 +50,7 @@ class Commit(object):
            os.remove(self.filename);
            self.filename = ''
            self.path = ''
-    def graph(self):
+    def graph(self, showTest):
         graph = pygraphviz.AGraph()
         graph.graph_attr.update(ranksep='2', ratio='compress',size='10.25,7.75')
         graph.node_attr.update(fontname='Arial', fontsize='30')
@@ -62,7 +62,8 @@ class Commit(object):
                 if callee.startswith("M_"):
                     graph.add_node(callee, style='filled', fillcolor='gray')
                 elif (callee[:4].lower() == 'test'):
-                    graph.add_node(callee, style='dotted', fontcolor='gray', layer='test')
+                    if showTest: 
+                       graph.add_node(callee, style='dotted', fontcolor='gray', layer='test')
                     tests.append(callee);           
                     testProgram = True;
                 else:
@@ -74,11 +75,13 @@ class Commit(object):
                            begin = line.find('Target') + 8
                            end = line.find('\\.ev3p')
                            if testProgram:
-                               graph.add_edge(callee, line[begin:end], style='dotted', weight=1,color='gray')
+                               if showTest:
+                                   graph.add_edge(callee, line[begin:end], style='dotted', weight=1,color='gray')
                            else:
                                graph.add_edge(callee, line[begin:end], penwidth=3, weight=10)
         imgbuf = cStringIO.StringIO()
-	graph.subgraph(nbunch=tests, name="cluster_tests",style="invis"); 
+        if showTest:
+	   graph.subgraph(nbunch=tests, name="cluster_tests",style="invis"); 
         graph.draw(imgbuf, format='svg',prog='dot')
 #        with open(self.filename + ".dot", "w") as outfile:
 #              outfile.write(graph.to_string());      

@@ -48,6 +48,7 @@ $("#graph").click(function(){
 <P>This shows every program and what MyBlocks it includes (and MyBlocks they include and so on).</P>
 <UL><LI>If you title a program starting with "M_" then it will show up as solid gray.  (FLL #447 uses this convention for missions.)</LI>
 <LI>If you title a program starting with "test" then it will have a dotted edge and gray text.</LI>
+<LI>If you click on the graph, it will show you the graph without programs that start with "test"</LI>
 </UL>
 <CENTER><IMG id="graph"
-  WIDTH="95%" TITLE="${project}-#${commit.cid()} call graph" SRC="graph?cid=${commit.cid()}" ALT="program call graph for ${project}-#${commit.cid()}"/></CENTER>
+  WIDTH="95%" TITLE="${project}-#${commit.cid()} call graph" SRC="graph?cid=${commit.cid()}&showTest=True" ALT="program call graph for ${project}-#${commit.cid()}"/></CENTER>
