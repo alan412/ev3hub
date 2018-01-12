@@ -49,7 +49,7 @@ class EV3hub(object):
         ev3p = self.users.get_project(username, project)
         if ev3p:
             Cookie('project').set(ev3p.name)
-        return ev3p 
+        return ev3p
 
     def show_loginpage(self, error=''):
         cherrypy.session.regenerate();
@@ -64,6 +64,8 @@ class EV3hub(object):
             return self.template("tags.html", project=project, error = error)
     def show_detailspage(self, project, commit, fileDetails, error=''):
         return self.template("details.html", project=project, commit = commit, fileDetails = fileDetails, error = error)
+    def show_graphpage(self, project, commit, error=''):
+        return self.template("graph.html", project=project, commit = commit, error = error)
     def show_mergepage(self, project, commit, different, error=''):
         return self.template("merge.html",project=project, commit = commit, different = different, error = error)
     def show_mainpage(self, username, error=''):
@@ -202,13 +204,13 @@ class EV3hub(object):
                 return 'Error removing project'
         else:
             return 'Incorrect password'
-    @cherrypy.expose 
+    @cherrypy.expose
     def renameProject(self, project, newName):
        username = Cookie('username').get('')
        if self.users.rename_project(username, project, newName):
           return 'Project renamed'
        else:
-          return 'Error renaming project' 
+          return 'Error renaming project'
     @cherrypy.expose
     def updateSettings(self, email, newpw1, newpw2, password):
         username = Cookie('username').get('')
@@ -222,8 +224,13 @@ class EV3hub(object):
         else:
            return 'Password was incorrect'
     @cherrypy.expose
+    def graphPage(self, cid):
+        ev3P = self.get_project()
+        commit = ev3P.getCommit(cid)
+        return self.show_graphpage(ev3P.name, commit)
+
+    @cherrypy.expose
     def graph(self, cid, showTest=False):
-        print showTest
         ev3P = self.get_project()
         cherrypy.response.headers['Content-Type'] = 'image/svg+xml'
         return ev3P.graph(cid,showTest)

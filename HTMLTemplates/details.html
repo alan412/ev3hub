@@ -12,7 +12,9 @@ $("#downloadCommit").click(function(){
 })
 $("#graph").click(function(){
   $("#modal-header").html("graph for ${project}-#${commit.cid()}");
-  $("#modal-body").html('<IMG WIDTH="95%" TITLE="${project}-#${commit.cid()} call graph" SRC="graph?cid=${commit.cid()}" ALT="program call graph for ${project}-#${commit.cid()}"/>');
+  $.post("graphPage", {cid: ${commit.cid()}}, function(result){
+    $("#modal-body").html(result);
+  });
 })
 </script>
 <CENTER><P class="button" id="downloadCommit">&darr; Download this commit &darr;</P></CENTER>

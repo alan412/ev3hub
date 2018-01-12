@@ -1,0 +1,27 @@
+<script>
+var testShown = false;
+
+$("#showTestBtn").click(function(){
+	if(testShown){
+		$("#showTestBtn").text("Show test programs")
+		$("#noTest").hide();
+		$("#test").show();
+		testShown = false;
+	}
+	else{
+		$("#showTestBtn").text("Hide test programs")
+		$("#noTest").show();
+		$("#test").hide();
+		testShown = true;
+	}
+})
+</script>
+
+<CENTER><button class="button" id="showTestBtn">Show test programs</button></CENTER>
+
+<DIV id="noTest" style="display:None">
+<IMG WIDTH="95%" TITLE="${project}-#${commit.cid()} call graph" SRC="graph?cid=${commit.cid()}&showTest=True" ALT="program call graph for ${project}-#${commit.cid()}"/>
+</DIV>
+<DIV id="test">
+<IMG WIDTH="95%" TITLE="${project}-#${commit.cid()} call graph" SRC="graph?cid=${commit.cid()}" ALT="program call graph for ${project}-#${commit.cid()}"/>
+</DIV>
