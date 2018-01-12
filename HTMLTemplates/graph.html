@@ -19,9 +19,5 @@ $("#showTestBtn").click(function(){
 
 <CENTER><button class="button" id="showTestBtn">Show test programs</button></CENTER>
 
-<DIV id="noTest" style="display:None">
-<IMG WIDTH="95%" TITLE="${project}-#${commit.cid()} call graph" SRC="graph?cid=${commit.cid()}&showTest=True" ALT="program call graph for ${project}-#${commit.cid()}"/>
-</DIV>
-<DIV id="test">
-<IMG WIDTH="95%" TITLE="${project}-#${commit.cid()} call graph" SRC="graph?cid=${commit.cid()}" ALT="program call graph for ${project}-#${commit.cid()}"/>
-</DIV>
+<IMG id="noTest" style="display:None" WIDTH="95%" TITLE="${project}-#${commit.cid()} call graph" SRC="graph?cid=${commit.cid()}&showTest=True" ALT="program call graph for ${project}-#${commit.cid()}"/>
+<IMG id="test" WIDTH="95%" TITLE="${project}-#${commit.cid()} call graph" SRC="graph?cid=${commit.cid()}" ALT="program call graph for ${project}-#${commit.cid()}"/>
