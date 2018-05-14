@@ -10,6 +10,7 @@ import random
 import ev3project
 from email.mime.text import MIMEText
 from operator import itemgetter
+#import urllib.request, urllib.parse, urllib.error
 import urllib
 import shutil
 
@@ -17,22 +18,22 @@ def getSHA(text):
     m = hashlib.sha1()
     m.update(text)
     return m.hexdigest()
-    
+
 class UserProjects(object):
     def __init__(self, username):
-        self.path = os.path.join('data', getSHA(username)) 
+        self.path = os.path.join('data', getSHA(username))
         if not os.path.exists(self.path):
-            os.makedirs(self.path)    
+            os.makedirs(self.path)
         self.username = username;
         self.proj_filepath = os.path.join(self.path, 'projects.json')
         self.load()
     def load(self):
         try:
             with open(self.proj_filepath, 'r') as project_file:
-                self.projects = json.loads(project_file.read())     
+                self.projects = json.loads(project_file.read())
         except:
             self.projects = {}
-            pass    
+            pass
     def save(self):
         with open(self.proj_filepath, 'w') as project_file:
                json.dump(self.projects, project_file)
@@ -52,7 +53,7 @@ class UserProjects(object):
             updated = os.path.getmtime(os.path.join(self.path, getSHA(project)));
             project_list.append({'name':project, 'Updated': updated })
         return project_list;
-    
+
 class Users(object):
     def __init__(self):
         self.users = {};
@@ -61,7 +62,7 @@ class Users(object):
         self.path = os.path.join('data','users.json')
         try:
             with open(self.path, 'r') as user_file:
-                self.users = json.loads(user_file.read())         
+                self.users = json.loads(user_file.read())
         except:
             pass
     def create_forgot_token(self, username):
@@ -78,20 +79,20 @@ class Users(object):
             self.save()
         except:
             forgotID = ''
-        return forgotID 
+        return forgotID
     def verify_forgot(self, username, forgot):
         try:
             if (self.users[username]['forgot-time'] < (time.time() + (60*60*24))) and pwd_context.verify(forgot, self.users[username]['forgot']):
                 self.users[username]['forgot'] = ''   # Don't save because the next step is changing password
                 self.users[username]['forgot-time'] = ''
-                return True;       
+                return True;
         except:
             pass
         return False
     def save(self):
         with open(self.path, 'w') as user_file:
                json.dump(self.users, user_file)
-        
+
 # if username already exists, this overwrites it.   So be careful upon calling it!
     def add(self, username, email, password):
         self.users[username] = {}
@@ -112,7 +113,7 @@ class Users(object):
         for key in self.users:
             if key.lower() == lower_username:
                 return key
-        return ''   # not found        
+        return ''   # not found
     def get_email(self, username):
         try:
             result = self.users[username]['email'];
@@ -152,30 +153,30 @@ class Users(object):
     def remove_project(self, username, project):
         up = UserProjects(username)
         shutil.rmtree(self.get_project_dir(username, project), True) # ignoring errors because we really don't have anything we can do about it
-        up.remove_project(project)   
-        return True 
+        up.remove_project(project)
+        return True
     def get_projectlist(self, username):
         up = UserProjects(username);
         projects_dates = up.get_project_list()
-        
-        return sorted(projects_dates, key=itemgetter('Updated'), reverse=True)    
-    def rename_project(self, username, oldName, newName): 
+
+        return sorted(projects_dates, key=itemgetter('Updated'), reverse=True)
+    def rename_project(self, username, oldName, newName):
         path = self.get_project_dir(username, oldName)
         newPath = self.get_project_dir(username, newName)
         if os.path.exists(newPath):   # Already a project by this name, don't allow duplicates
            return False
         if os.path.exists(path):
-           os.rename(path, newPath)        
+           os.rename(path, newPath)
         up = UserProjects(username);
         up.rename_project(oldName, newName);
-        return True 
+        return True
     def project_exists(self, username, project):
         path = self.get_project_dir(username, project)
         if os.path.exists(path):
             return True
         else:
             return False
-    
+
     def mail_token(self, username_in):
         username = self.get(username_in)
         if not username:
@@ -184,31 +185,31 @@ class Users(object):
            mail = self.get_email(username);
            if not mail:
               return "No email defined for user:{0}".format(username)
-   
+
            token = self.create_forgot_token(username)
            if not token:
               return "Tokens only sent every 5 minutes per user.  Please check your email."
 
-           safe_username=urllib.quote_plus(username)
-           msg = MIMEText("Please go to http://beta.ev3hub.com/forgot?username=" + safe_username + 
+           safe_username=urllib.parse.quote_plus(username)
+           msg = MIMEText("Please go to http://beta.ev3hub.com/forgot?username=" + safe_username +
                "&token=" + token + " to reset your password.  If you did not request that you had forgotten " +
-               "your password, then you can safely ignore this e-mail.  This expires in 24 hours.\n\nThank you,\nThe EV3HUB team");          
+               "your password, then you can safely ignore this e-mail.  This expires in 24 hours.\n\nThank you,\nThe EV3HUB team");
 
            from_email = 'ev3hub@ev3hub.com';
            msg['To'] = email.utils.formataddr((username, mail))
            msg['From'] = email.utils.formataddr(('EV3Hub Admin', from_email))
            msg['Subject'] = 'Forgotten Password'
-           
+
 #           print "Simulating sending: {0}, {1},{2}".format(from_email, mail, msg.as_string())
 #           return ''
 
-           server = smtplib.SMTP('localhost')       
+           server = smtplib.SMTP('localhost')
            try:
               server.sendmail(from_email, [mail], msg.as_string())
            finally:
               server.quit()
               return ''
-             
+
 
 if __name__ == '__main__':
-   print "Need to create unit test code"
+   print("Need to create unit test code")

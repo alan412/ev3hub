@@ -196,7 +196,6 @@ class EV3hub(object):
     @cherrypy.expose
     def removeProject(self, project, password):
         username = Cookie('username').get('')
-        print 'Trying'
         if self.users.verify_password(username, password):
             if self.users.remove_project(username, project):
                 return 'Project "' + project +'" deleted'
@@ -242,7 +241,7 @@ class EV3hub(object):
         commit = ev3P.getCommit(cid)
         (p, added, modified) = ev3P.try_merge(commit)
 
-        different = sorted(added+modified, key=unicode.lower)
+        different = sorted(added+modified, key=str.lower)
 
         return self.show_mergepage(ev3P, commit, different);
     @cherrypy.expose
@@ -251,7 +250,7 @@ class EV3hub(object):
         commit_files = []
         head_files = []
 
-        if isinstance(files, basestring):
+        if isinstance(files, str):
             info = files.split(':', 1);
             if info[0] == 'head':
                 head_files.append(info[1])
@@ -356,7 +355,7 @@ class EV3hub(object):
             if filename not in filelist:
                 filelist.append(filename)
 
-        for filename in sorted(filelist, key=unicode.lower):
+        for filename in sorted(filelist, key=str.lower):
             sha1 = commit1.getSHA(filename)
             sha2 = commit2.getSHA(filename)
             if (sha1 == sha2) and (not sha1):   # is a variable

@@ -65,7 +65,7 @@ class EV3Project(object):
               return self.getCommit(self.tags[tag])
         return nil
     def listTags(self):
-        return collections.OrderedDict(sorted(self.tags.items(), key=lambda t: t[1], reverse=True));
+        return collections.OrderedDict(sorted(list(self.tags.items()), key=lambda t: t[1], reverse=True));
 
     def fullpath(self, filename):
         return os.path.join(self.path, filename)
@@ -169,9 +169,9 @@ class EV3Project(object):
         while commit and commit.parent():
             foundList = [];
             for fm in self.failedMerges:
-                print "FM-{0},{1}".format(fm, commit.cid())
+                print("FM-{0},{1}".format(fm, commit.cid()))
                 if ("{0}".format(fm) == "{0}".format(commit.cid())):
-                    print " wow"
+                    print(" wow")
                     foundList.append(fm)
             if foundList:
                 for fm in foundList:
@@ -253,7 +253,7 @@ class EV3Project(object):
                 for filename in errors_modified:
                     errors.append("{0} modified in both".format(filename))
 
-                print "Errors: {0}".format(errors)
+                print("Errors: {0}".format(errors))
 
                 if not errors:
                     self.remove_failed_merges(id_commit);
@@ -291,9 +291,9 @@ if __name__ == "__main__":
 
     merge_errors = ev3P.merge(cid)
     if merge_errors:
-       print merge_errors
+       print(merge_errors)
     else:
-       print "Successful merge!"
+       print("Successful merge!")
 
     with open("out.zip", "w") as outfile:
        outfile.write(ev3P.download(ev3P.head))

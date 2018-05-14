@@ -7,6 +7,8 @@ This starts from the great work done by Thad Hughes at https://github.com/Thadde
 This is from reverse engineering the EV3 format.  (which could change at any time)
 There is absolutely **NO** promise made that your data will be ok.   It has not been thoroughly tested.
 
+Note that this now REQUIRES python3.5 or higher
+
 # Known Issues 
 All known issues are located here:
 https://github.com/alan412/ev3hub/issues
