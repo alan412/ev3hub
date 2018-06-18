@@ -94,7 +94,7 @@ class Commit(object):
         myblockdefs = []
         medias = []
 
-        ev3Contents = io.StringIO()
+        ev3Contents = io.BytesIO()
 
         ev3_template = Template(filename='HTMLTemplates/lvprojx.html');
 
@@ -145,7 +145,7 @@ class Commit(object):
     def from_ev3file(cls, path, cid, ev3data, comment, who, host, project_name):
         files = {};
         parent = 0;
-        in_memory_zip = io.StringIO(ev3data)
+        in_memory_zip = io.BytesIO(ev3data)
         with zipfile.ZipFile(in_memory_zip, "r", zipfile.ZIP_DEFLATED, False) as zf:
             for fileName in zf.namelist():
                 if zf.getinfo(fileName).file_size > 1024*1024*1024:  # don't allow larger than 1MB
