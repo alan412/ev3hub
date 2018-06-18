@@ -16,7 +16,7 @@ import shutil
 
 def getSHA(text):
     m = hashlib.sha1()
-    m.update(text)
+    m.update(text.encode('utf-8'))
     return m.hexdigest()
 
 class UserProjects(object):
