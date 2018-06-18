@@ -81,7 +81,7 @@ class Commit(object):
                                    graph.add_edge(callee, line[begin:end], style='dotted', weight=1,color='gray')
                            else:
                                graph.add_edge(callee, line[begin:end], penwidth=3, weight=10, color='black')
-        imgbuf = io.StringIO()
+        imgbuf = io.BytesIO()
         if showTest:
             graph.subgraph(nbunch=tests, name="cluster_tests",style="invis");
         graph.draw(imgbuf, format='svg',prog='dot')
@@ -152,7 +152,7 @@ class Commit(object):
                     raise zipfile.BadZipfile
                 if fileName == "ev3hub.json":
                     with zf.open("ev3hub.json", 'r') as json_file:
-                        data = json.loads(json_file.read())
+                        data = json.loads(json_file.read().decode('utf8'))
                         if data["project"] == project_name:
                            parent = data["fromCommit"]
                 elif fileName == "Project.lvprojx":
