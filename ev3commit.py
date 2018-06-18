@@ -107,7 +107,7 @@ class Commit(object):
                     variables[varInfo[1]] = varInfo[0]
                 else:
                     repo_filename = os.path.join(self.path, "repo", self.files()[filename])
-                    with open(repo_filename, 'r') as file:
+                    with open(repo_filename, 'rb') as file:
                         zf.writestr(filename, file.read())
                     file_parts = filename.split('.',1);
 
