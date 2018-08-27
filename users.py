@@ -35,6 +35,8 @@ class UserProjects(object):
         self.username = username;
         self.proj_filepath = os.path.join(self.path, 'projects.json')
         self.load()
+        self.remove_expired_projects()
+
     def load(self):
         try:
             with open(self.proj_filepath, 'r') as project_file:
