@@ -41,7 +41,6 @@ class UserProjects(object):
         try:
             with open(self.proj_filepath, 'r') as project_file:
                 self.projects = json.loads(project_file.read())
-                print("list: ", self.projects)
                 for project in self.projects:
                     if 'expires' in self.projects[project]:
                         self.projects[project]['expires'] = datetime.datetime.fromisoformat(self.projects[project]['expires'])
@@ -89,7 +88,6 @@ class UserProjects(object):
         for project in self.projects:
             updated = os.path.getmtime(os.path.join(self.path, getSHA(project)));
             expires = 0;
-            print("Project ", project)
             if 'expires' in self.projects[project]:
                 expires = self.projects[project]['expires'].timestamp()
             project_list.append({'name':project, 'Updated': updated, 'expires': expires })
