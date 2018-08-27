@@ -66,7 +66,7 @@ class UserProjects(object):
         currTime = datetime.datetime.now();
         tmpProjects = self.projects;
         for project in tmpProjects:
-            if 'expires' in self.projects[project]['expires']:
+            if 'expires' in self.projects[project]:
                 if self.projects[project]['expires'] < currTime:
                    projectDir = os.path.join(self.path(), getSHA(project))
                    shutil.rmtree(projectDir, True) # ignoring errors because we really don't have anything we can do about it
