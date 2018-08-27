@@ -10,7 +10,19 @@ Rename lets you rename a project.<br/>
 <TABLE class='projects' width="100%" border="1">
 <TR><TH width="5%">Delete</TH><TH width="5%">Rename</TH><TH width="50%">Project Name</TH><TH>Last Changed</TH></TR>
 	% for project in projects:
-		<TR class='projects' project="${project['name']}"><TD class="delete">&#127335;</TD><TD class="rename">&#9998;</TD><TD class="name">${project['name']}</TD><TD class="date">${project['Updated']}</TD></TR>
+	   % if project['expires'] == 0:
+		    <TR class='projects' project="${project['name']}"><TD class="delete">&#127335;</TD><TD class="rename">&#9998;</TD><TD class="name">${project['name']}</TD><TD class="date">${project['Updated']}</TD></TR>
+		 % endif
+	% endfor
+</TABLE>
+<br/>
+<H1>Expiring Projects</H1>
+<TABLE class='projects' width="100%" border="1">
+<TR><TH width="10%">Restore</TH><TH width="50%">Project Name</TH><TH>Will expire on</TH></TR>
+	% for project in projects:
+	   % if project['expires'] != 0:
+		    <TR class='projects' project="${project['name']}"><TD class="restore">&#10226;</TD><TD class="name">${project['name']}</TD><TD class="date">${project['expires']}</TD></TR>
+		 % endif
 	% endfor
 </TABLE>
 % else:
@@ -37,7 +49,7 @@ Rename lets you rename a project.<br/>
 $(document).ready(function(){
 	$("td.delete").click(function(){
 		var projectName = $(this).parent().attr("project")
-		password = prompt("To delete project '" + projectName +"', you need to enter your password.\nThis CANNOT be undone!!!", "password")
+		password = prompt("To delete project '" + projectName +"', you need to enter your password.", "password")
 		if (password){
 			$.post("removeProject", {project: projectName, password: password}, function(result){
 				alert(result);
@@ -45,6 +57,14 @@ $(document).ready(function(){
 			});
 		};
 	});
+		$("td.restore").click(function(){
+			var projectName = $(this).parent().attr("project")
+			$.post("restoreProject", {project: projectName}, function(result){
+					alert(result);
+					location.reload(true);
+				});
+			});
+
         $("td.rename").click(function(){
                var oldName = $(this).parent().attr("project")
                newName = prompt("Enter new name for project: " + oldName, "newName")

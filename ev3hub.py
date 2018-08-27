@@ -211,6 +211,14 @@ class EV3hub(object):
        else:
           return 'Error renaming project'
     @cherrypy.expose
+    def restoreProject(self, project):
+       username = Cookie('username').get('')
+       if self.users.restore_project(username, project):
+          return 'Project restored'
+       else:
+          return 'Error restoring project'
+
+    @cherrypy.expose
     def updateSettings(self, email, newpw1, newpw2, password):
         username = Cookie('username').get('')
         if self.users.verify_password(username, password):

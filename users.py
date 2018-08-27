@@ -13,11 +13,19 @@ from operator import itemgetter
 #import urllib.request, urllib.parse, urllib.error
 import urllib
 import shutil
+import datetime;
 
 def getSHA(text):
     m = hashlib.sha1()
     m.update(text.encode('utf-8'))
     return m.hexdigest()
+
+def json_serial(obj):
+    """JSON serializer for objects not serializable by default json code"""
+
+    if isinstance(obj, datetime.datetime):
+        return obj.isoformat()
+    raise TypeError ("Type %s not serializable" % type(obj))
 
 class UserProjects(object):
     def __init__(self, username):
@@ -31,27 +39,58 @@ class UserProjects(object):
         try:
             with open(self.proj_filepath, 'r') as project_file:
                 self.projects = json.loads(project_file.read())
+                print("list: ", self.projects)
+                for project in self.projects:
+                    if 'expires' in self.projects[project]:
+                        self.projects[project]['expires'] = datetime.datetime.fromisoformat(self.projects[project]['expires'])
         except:
             self.projects = {}
             pass
     def save(self):
         with open(self.proj_filepath, 'w') as project_file:
-               json.dump(self.projects, project_file)
+               json.dump(self.projects, project_file, default=json_serial)
     def add_project(self, projname):
         self.projects[projname] = {}
         self.save();
-    def remove_project(self, projname):
-        self.projects.pop(projname, None)
+    def expire_project(self, projName):
+        self.projects[projName]['expires'] = datetime.datetime.now() + datetime.timedelta(days=7)
         self.save();
+    def restore_project(self, projName):
+        del self.projects[projName]['expires']
+        filename = os.path.join(self.path, getSHA(projName))
+        os.utime(filename, None)  # Sets modification time to now
+        self.save();
+    def remove_expired_projects(self):
+        currTime = datetime.datetime.now();
+        tmpProjects = self.projects;
+        for project in tmpProjects:
+            if 'expires' in self.projects[project]['expires']:
+                if self.projects[project]['expires'] < currTime:
+                   projectDir = os.path.join(self.path(), getSHA(project))
+                   shutil.rmtree(projectDir, True) # ignoring errors because we really don't have anything we can do about it
+                   self.projects.pop(project, None)
+                   self.save();
     def rename_project(self, oldName, newName):
         self.projects.pop(oldName, None);
         self.projects[newName] = {}
         self.save();
+    def expire_old_projects(self):
+        oldTime = datetime.datetime.now() - datetime.timedelta(days=365);
+        for project in self.projects:
+            if not project['expires']:
+               updated = datetime.datetime.fromtimestamp(os.path.getmtime(os.path.join(self.path, getSHA(project))));
+               if updated < oldTime:
+                  self.expire_project(project)
+
     def get_project_list(self):
         project_list = []
         for project in self.projects:
             updated = os.path.getmtime(os.path.join(self.path, getSHA(project)));
-            project_list.append({'name':project, 'Updated': updated })
+            expires = 0;
+            print("Project ", project)
+            if 'expires' in self.projects[project]:
+                expires = self.projects[project]['expires'].timestamp()
+            project_list.append({'name':project, 'Updated': updated, 'expires': expires })
         return project_list;
 
 class Users(object):
@@ -150,10 +189,33 @@ class Users(object):
         up = UserProjects(username)
         ev3project.EV3Project.newProject(project, self.get_project_dir(username, project), ev3data, who, host)
         up.add_project(project)
+    def restore_project(self, username, project):
+        up = UserProjects(username)
+        up.restore_project(project)
+        return True;
+
     def remove_project(self, username, project):
         up = UserProjects(username)
-        shutil.rmtree(self.get_project_dir(username, project), True) # ignoring errors because we really don't have anything we can do about it
-        up.remove_project(project)
+        up.expire_project(project)
+        mail = self.get_email(username);
+        if mail:
+           safe_username=urllib.parse.quote_plus(username)
+           msg = MIMEText("Someone marked project '" + project + "' for deletion.\n" +
+           "If this wasn't intentional, it can be recovered for the next 7 days from the list of projects.")
+
+           from_email = 'ev3hub@ev3hub.com';
+           msg['To'] = email.utils.formataddr((username, mail))
+           msg['From'] = email.utils.formataddr(('EV3Hub Admin', from_email))
+           msg['Subject'] = 'Project Deleted'
+
+#           print "Simulating sending: {0}, {1},{2}".format(from_email, mail, msg.as_string())
+#           return ''
+
+           server = smtplib.SMTP('localhost')
+           try:
+              server.sendmail(from_email, [mail], msg.as_string())
+           finally:
+              server.quit()
         return True
     def get_projectlist(self, username):
         up = UserProjects(username);
