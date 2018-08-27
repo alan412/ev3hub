@@ -14,6 +14,7 @@ from operator import itemgetter
 import urllib
 import shutil
 import datetime;
+import dateutil.parser
 
 def getSHA(text):
     m = hashlib.sha1()
@@ -38,15 +39,17 @@ class UserProjects(object):
         self.remove_expired_projects()
 
     def load(self):
-        try:
+#        try:
             with open(self.proj_filepath, 'r') as project_file:
                 self.projects = json.loads(project_file.read())
+                print("All", self.projects)
                 for project in self.projects:
                     if 'expires' in self.projects[project]:
-                        self.projects[project]['expires'] = datetime.datetime.fromisoformat(self.projects[project]['expires'])
-        except:
-            self.projects = {}
-            pass
+                        self.projects[project]['expires'] = dateutil.parser.parse(self.projects[project]['expires'])
+                        print("Expires: ", self.projects[project]['expires'])
+#        except:
+#            self.projects = {}
+#            pass
     def save(self):
         with open(self.proj_filepath, 'w') as project_file:
                json.dump(self.projects, project_file, default=json_serial)
