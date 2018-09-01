@@ -39,7 +39,7 @@ class UserProjects(object):
         self.remove_expired_projects()
 
     def load(self):
-#        try:
+        try:
             with open(self.proj_filepath, 'r') as project_file:
                 self.projects = json.loads(project_file.read())
                 print("All", self.projects)
@@ -47,9 +47,9 @@ class UserProjects(object):
                     if 'expires' in self.projects[project]:
                         self.projects[project]['expires'] = dateutil.parser.parse(self.projects[project]['expires'])
                         print("Expires: ", self.projects[project]['expires'])
-#        except:
-#            self.projects = {}
-#            pass
+        except:
+            self.projects = {}
+            pass
     def save(self):
         with open(self.proj_filepath, 'w') as project_file:
                json.dump(self.projects, project_file, default=json_serial)
