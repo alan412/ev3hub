@@ -126,7 +126,8 @@ class Users(object):
     def create_forgot_token(self, username):
         try:
             # to keep mspradli from spamming people
-            if self.users[username]['forgot-time'] < (time.time() + 300):
+            forgotTime = self.users[username]['forgot-time']
+            if forgotTime and float(forgotTime) < (time.time() + 300):
                 return ''
         except KeyError:
             pass
@@ -308,6 +309,8 @@ class Users(object):
             server = smtplib.SMTP('localhost')
             try:
                 server.sendmail(from_email, [mail], msg.as_string())
+            except IOError:
+                print('Failed to send e-mail')
             finally:
                 server.quit()
             return ''
