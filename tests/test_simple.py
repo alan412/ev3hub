@@ -76,8 +76,18 @@ class SimpleCPTest(helper.CPWebCase):
         self.getPage('/changeProject', headers, 'POST', body)
         self.assertStatus(200)
 
+    def test_listProjects_not_logged_in(self):
+        self.getPage('/projects')
+        self.assertStatus(200)
+
+    def test_getMergePage(self):
+        self.sendForm("/merge", 'cid=5')
+
+    def test_ignoreFailedMerge(self):
+        self.sendForm("/ignoreFailedMerge", 'cid=5&comment=Miscellaneous')
+
     def test_logins(self):
-        self.sendForm("/login", 'username=fll447&password=test')
+        self.sendForm("/login", 'username=fll447&password=kira')
         self.sendForm("/login", 'username=fll447&password=badPassword')
 
     def test_createUser(self):
@@ -87,3 +97,9 @@ class SimpleCPTest(helper.CPWebCase):
             "/createUser", 'username=fll447&email=asd&password=pass&password2=pass')
         self.sendForm(
             "/createUser", 'username=fred&email=asd&password=pass&password2=pass')
+
+    def test_forgotPass(self):
+        self.sendForm('/forgotPass', 'username=fll447')
+
+    def test_forgot(self):
+        self.sendForm('/forgot', 'username=fll447&token=ABCD')
