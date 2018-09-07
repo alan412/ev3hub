@@ -11,3 +11,5 @@ sessions/
 venv/
 # Keep out local scripts to deal with remote server
 remote/
+# Keep out editor
+.vscode/
