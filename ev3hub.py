@@ -23,10 +23,6 @@ class Cookie(object):
         """Set the value of the cookie"""
         cherrypy.session[self.name] = value
 
-    def delete(self):
-        """Delete the cookie"""
-        cherrypy.session.pop(self.name, None)
-
 
 class EV3hub(object):
     """"Web interface for EV3Hub"""
