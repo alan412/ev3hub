@@ -94,7 +94,7 @@ class EV3Project(object):
                 try:
                     self.tags = data["tags"]
                 except KeyError:
-                    self.tags = []
+                    self.tags = {}
         except IOError:
             pass
 
