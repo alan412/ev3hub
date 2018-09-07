@@ -91,8 +91,9 @@ class EV3Project(object):
                 self.failedMerges = data["failedMerges"]
                 if self.failedMerges is None:
                     self.failedMerges = []
-                self.tags = data["tags"]
-                if self.tags is None:
+                try:
+                    self.tags = data["tags"]
+                except KeyError:
                     self.tags = []
         except IOError:
             pass

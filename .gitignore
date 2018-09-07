@@ -13,3 +13,10 @@ venv/
 remote/
 # Keep out editor
 .vscode/
+# Keep out coverage
+.coverage
+htmlcov/
+# Keep out caches
+.pytest_cache/
+# Keep out package info
+*.egg-info/
