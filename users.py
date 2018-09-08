@@ -57,6 +57,9 @@ class UserProjects(object):
         with open(self.proj_filepath, 'w') as project_file:
             json.dump(self.projects, project_file, default=json_serial)
 
+    def project_exists(self, projname):
+        return projname in self.projects
+
     def add_project(self, projname):
         self.projects[projname] = {}
         self.save()
@@ -144,11 +147,12 @@ class Users(object):
 
     def verify_forgot(self, username, forgot):
         try:
-            if (self.users[username]['forgot-time'] < (time.time() + (60*60*24))
-                    ) and pwd_context.verify(forgot, self.users[username]['forgot']):
+            forgotTime = self.users[username]['forgot-time']
+            if forgotTime and (float(forgotTime) < (time.time() + (60*60*24))
+                               ) and pwd_context.verify(forgot, self.users[username]['forgot']):
                     # Don't save because the next step is changing password
                 self.users[username]['forgot'] = ''
-                self.users[username]['forgot-time'] = ''
+                forgotTime = ''
                 return True
         except KeyError:
             pass
@@ -223,18 +227,22 @@ class Users(object):
             project, self.get_project_dir(username, project), ev3data, who, host)
         up.add_project(project)
 
-    def restore_project(self, username, project):
+    def restore_project(self, username, projectName):
         up = UserProjects(username)
-        up.restore_project(project)
-        return True
+        if up.project_exists(projectName):
+            up.restore_project(projectName)
+            return True
+        return False
 
-    def remove_project(self, username, project):
+    def remove_project(self, username, projectName):
         up = UserProjects(username)
-        up.expire_project(project)
+        if not up.project_exists(projectName):
+            return False
+        up.expire_project(projectName)
         mail = self.get_email(username)
         if mail:
             safe_username = urllib.parse.quote_plus(username)
-            msg = MIMEText("Someone marked project '" + project + "' for deletion.\n" +
+            msg = MIMEText("Someone marked project '" + projectName + "' for deletion.\n" +
                            "If this wasn't intentional, it can be recovered for " +
                            "the next 7 days from the list of projects.")
 
@@ -243,14 +251,13 @@ class Users(object):
             msg['From'] = email.utils.formataddr(('EV3Hub Admin', from_email))
             msg['Subject'] = 'Project Deleted'
 
-#           print "Simulating sending: {0}, {1},{2}".format(from_email, mail, msg.as_string())
-#           return ''
-
-            server = smtplib.SMTP('localhost')
             try:
+                server = smtplib.SMTP('localhost')
                 server.sendmail(from_email, [mail], msg.as_string())
-            finally:
                 server.quit()
+            except IOError:
+                print('Error sending email')
+
         return True
 
     def get_projectlist(self, username):
@@ -265,8 +272,10 @@ class Users(object):
         # Already a project by this name, don't allow duplicates
         if os.path.exists(newPath):
             return False
-        if os.path.exists(path):
-            os.rename(path, newPath)
+        if not os.path.exists(path):
+            return False
+        os.rename(path, newPath)
+
         up = UserProjects(username)
         up.rename_project(oldName, newName)
         return True
@@ -306,13 +315,12 @@ class Users(object):
 #           print "Simulating sending: {0}, {1},{2}".format(from_email, mail, msg.as_string())
 #           return ''
 
-            server = smtplib.SMTP('localhost')
             try:
+                server = smtplib.SMTP('localhost')
                 server.sendmail(from_email, [mail], msg.as_string())
+                server.quit()
             except IOError:
                 print('Failed to send e-mail')
-            finally:
-                server.quit()
             return ''
 
 
