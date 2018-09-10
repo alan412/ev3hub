@@ -154,3 +154,13 @@ class SimpleCPTest(helper.CPWebCase):
 
         self.getPageWithPatch('/newProject', newHeaders,
                               'POST', req.body, expectedStatus=303)
+        data = {'project': 'test12345', 'comment': 'test',
+                'who': 'me', 'host': '127.0.0.1'}
+        files = {'ev3file': ('newFile.ev3', open('data/newFile.ev3', 'rb'))}
+        req = requests.Request(url=url,
+                               files=files, data=data).prepare()
+        newHeaders = [('Content-type', req.headers['Content-type']),
+                      ('Content-Length', req.headers['Content-Length'])]
+
+        self.getPageWithPatch('/uploadDone', newHeaders,
+                              'POST', req.body)
