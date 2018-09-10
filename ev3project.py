@@ -116,19 +116,18 @@ class EV3Project(object):
             cid = cid + 1
         return str(cid)
 
-    def download(self, cid):
+    def from_id(self, cid):
         commit_id = cid
         if cid == "head":
             commit_id = self.head
 
-        return Commit.from_id(self.path, commit_id).get_ev3_data(self.name)
+        return Commit.from_id(self.path, commit_id)
+
+    def download(self, cid):
+        return self.from_id(cid).get_ev3_data(self.name)
 
     def graph(self, cid, showTest):
-        commit_id = cid
-        if cid == "head":
-            commit_id = self.head
-
-        return Commit.from_id(self.path, commit_id).graph(showTest)
+        return self.from_id(cid).graph(showTest)
 
     def getDetails(self, cid):
         main_commit = Commit.from_id(self.path, cid)
