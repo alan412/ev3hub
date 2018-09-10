@@ -168,6 +168,19 @@ class EV3Project(object):
                 parents2.append("0")
         return (set(parents1) & set(parents2)).pop()
 
+    def find_possible_parent(self, commit):
+        # Start with head and go backwards
+        poss_id = int(self.head)
+
+        while poss_id > 0:
+            possParent = self.from_id(poss_id)
+            print("Thoughts: ", possParent.parent(), possParent.host(),
+                  " ?= ", commit.parent(), commit.host())
+            if possParent.parent() == commit.parent() and possParent.host() == commit.host():
+                return possParent
+            poss_id -= 1
+        return None
+
     def remove_failed_merges(self, commit):
         while commit and commit.parent():
             foundList = []
@@ -265,7 +278,21 @@ class EV3Project(object):
                 for filename in errors_modified:
                     errors.append("{0} modified in both".format(filename))
 
-                print("Errors: {0}".format(errors))
+                if errors:   # Attempt to fix by seeing if download was just forgotten
+                    possParent = self.find_possible_parent(id_commit)
+                    if possParent:
+                        oldParent = id_commit.parent()
+                        id_commit.commitDetails["parent"] = possParent.cid()
+                        (new_proposed_head, new_add_errors,
+                         new_merge_errors) = self.try_merge(id_commit)
+                        if (not new_add_errors) and (not new_merge_errors):
+                            proposed_head_commit = new_proposed_head
+                            errors = []
+                            id_commit.save()
+                        else:
+                            id_commit.commitDetails["parent"] = oldParent
+                            print('Not possible parent',
+                                  new_add_errors, new_merge_errors)
 
                 if not errors:
                     self.remove_failed_merges(id_commit)
