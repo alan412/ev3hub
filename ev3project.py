@@ -174,9 +174,7 @@ class EV3Project(object):
 
         while poss_id > 0:
             possParent = self.from_id(poss_id)
-            print("Thoughts: ", possParent.parent(), possParent.host(),
-                  " ?= ", commit.parent(), commit.host())
-            if possParent.parent() == commit.parent() and possParent.host() == commit.host():
+            if possParent.origParent() == commit.parent() and possParent.host() == commit.host():
                 return possParent
             poss_id -= 1
         return None
@@ -281,8 +279,7 @@ class EV3Project(object):
                 if errors:   # Attempt to fix by seeing if download was just forgotten
                     possParent = self.find_possible_parent(id_commit)
                     if possParent:
-                        oldParent = id_commit.parent()
-                        id_commit.commitDetails["parent"] = possParent.cid()
+                        id_commit.commitDetails["newParent"] = possParent.cid()
                         (new_proposed_head, new_add_errors,
                          new_merge_errors) = self.try_merge(id_commit)
                         if (not new_add_errors) and (not new_merge_errors):
@@ -290,7 +287,7 @@ class EV3Project(object):
                             errors = []
                             id_commit.save()
                         else:
-                            id_commit.commitDetails["parent"] = oldParent
+                            id_commit.commitDetails["newParent"] = ""
                             print('Not possible parent',
                                   new_add_errors, new_merge_errors)
 

@@ -36,6 +36,11 @@ class Commit(object):
             del self.commitDetails["files"][filename]
 
     def parent(self):
+        if "newParent" in self.commitDetails:
+            return self.commitDetails["newParent"]
+        return self.commitDetails["parent"]
+
+    def origParent(self):
         return self.commitDetails["parent"]
 
     def time(self):
