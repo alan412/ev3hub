@@ -340,6 +340,12 @@ class EV3hub(object):
         return ev3P.addIgnoreComment(cid, comment)
 
     @cherrypy.expose
+    def changeHead(self, cid):
+        """changes what the HEAD is for a project"""
+        ev3P = self.get_project()
+        return ev3P.change_head(cid)
+
+    @cherrypy.expose
     def createTag(self, cid, description):
         """create a tag for a commit id"""
         ev3P = self.get_project()

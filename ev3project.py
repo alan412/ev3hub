@@ -129,6 +129,12 @@ class EV3Project(object):
     def graph(self, cid, showTest):
         return self.from_id(cid).graph(showTest)
 
+    def change_head(self, cid):
+        # Should this check to see if it is valid?  I can't see a way through
+        # the website that it can be wrong...
+        self.head = cid
+        self.save()
+
     def getDetails(self, cid):
         main_commit = Commit.from_id(self.path, cid)
         commits = self.getListOfCommits()
