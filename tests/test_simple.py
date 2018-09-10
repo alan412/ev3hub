@@ -2,6 +2,7 @@ import base64
 
 from unittest.mock import patch
 
+import requests
 import cherrypy
 from cherrypy.test import helper
 from cherrypy.lib.sessions import RamSession
@@ -13,11 +14,6 @@ class SimpleCPTest(helper.CPWebCase):
     @staticmethod
     def setup_server():
         cherrypy.tree.mount(EV3hub(), '/', 'development.conf')
-
-# note to self - look at pytest-datafiles
-    def load_file(self, filename):
-        with open(filename, 'rb') as f:
-            return base64.b64encode(f.read())
 
     def getPageWithPatch(self, page, headers=None, method='GET', body=None, expectedStatus=200):
         sess_mock = RamSession()
@@ -148,19 +144,13 @@ class SimpleCPTest(helper.CPWebCase):
             '/updateSettings', 'email=alan@randomsmiths.com&newpw1=kira&newpw2=kira&password=kira')
 
     def test_new_project(self):
-        boundary = "---Impossible4394932"
-        body = ('--'+boundary + '\r\nContent-Disposition: form-data; name="project"\r\n\r\n'
-                'test12345\r\n' +
-                '--'+boundary + '\r\nContent-Disposition: form-data; name="who"\r\n\r\n'
-                'me\r\n' +
-                '--'+boundary + '\r\nContent-Disposition: form-data; name="host"\r\n\r\n'
-                '127.0.0.1\r\n--' + boundary +
-                '\r\nContent-Disposition: form-data; name="ev3file"; filename="newFile.ev3"\r\n' +
-                'Content-Type: application/octet-stream\r\n\r\n' +
-                str(self.load_file('data/newFile.ev3')) +
-                '\r\n--'+boundary+'--\r\n')
+        url = 'http://newProject'
+        data = {'project': 'test12345', 'who': 'me', 'host': '127.0.0.1'}
+        files = {'ev3file': ('newFile.ev3', open('data/newFile.ev3', 'rb'))}
+        req = requests.Request(url=url,
+                               files=files, data=data).prepare()
+        newHeaders = [('Content-type', req.headers['Content-type']),
+                      ('Content-Length', req.headers['Content-Length'])]
 
-        header = [('Content-type', 'multipart/form-data; boundary='+boundary),
-                  ('Content-Length', str(len(body)))]
-        print(header, '\n', body)
-        self.getPageWithPatch('/newProject', header, 'POST', body)
+        self.getPageWithPatch('/newProject', newHeaders,
+                              'POST', req.body, expectedStatus=303)
