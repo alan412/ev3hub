@@ -306,28 +306,30 @@ class EV3hub(object):
     def uploadDone(self, project, comment, who, host, ev3file):
         """send upload commit"""
         error = ''
+
+        Cookie('host').set(host)
+        Cookie('who').set(who)
+
+        ev3P = self.get_project()
+        if ev3P.name != project:
+            return 'Error: uploading to different project!'
         try:
-            Cookie('host').set(host)
-            Cookie('who').set(who)
             ev3data = ev3file.file.read()
-
-            ev3P = self.get_project()
-            if ev3P.name != project:
-                return 'Error: uploading to different project!'
-
             cid = ev3P.uploadCommit(ev3data, comment, who, host)
-            if not cid:
-                return 'Error: No changes from head, upload not saved'
-            merge_errors = ev3P.merge(cid)
-            if merge_errors:
-                if len(merge_errors) == 1:
-                    error = 'Merge Error:'
-                else:
-                    error = 'Merge Errors:'
-                for me in merge_errors:
-                    error = error + '\n' + me
         except:  # pylint: disable=bare-except
-            error = 'Error in uploading.  Upload not saved'
+            return 'Error in uploading.  Upload not saved'
+
+        if not cid:
+            return 'Error: No changes from head, upload not saved'
+
+        merge_errors = ev3P.merge(cid)
+        if merge_errors:
+            if len(merge_errors) == 1:
+                error = 'Merge Error:'
+            else:
+                error = 'Merge Errors:'
+            for me in merge_errors:
+                error = error + '\n' + me
 
         return error
 
