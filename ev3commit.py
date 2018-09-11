@@ -46,9 +46,6 @@ class Commit(object):
     def time(self):
         return self.commitDetails["time"]
 
-    def timeStr(self):
-        return time.strftime("%a %b %d, %Y %I:%M %p %Z", time.localtime(self.time()))
-
     def name(self):
         return self.commitDetails["name"]
 
