@@ -151,9 +151,12 @@ class EV3Project(object):
         cid = self.findNextCommit()
         commit = Commit.from_ev3file(
             self.path, cid, ev3data, comment, who, host, self.name)
+        if cid == "1":   # first one
+            return cid
+
         head = Commit.from_id(self.path, self.head)
         cs = Changeset(commit, head)
-        if (not cs.different()) and (cid != "1"):
+        if not cs.different():
             commit.delete()
             return 0
         return cid
