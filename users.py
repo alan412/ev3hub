@@ -213,7 +213,7 @@ class Users(object):
         if not projectName:
             try:
                 projectName = self.get_projectlist(username)[0]['name']
-            except KeyError, IndexError:
+            except (KeyError, IndexError):
                 return None
         proj_dir = self.get_project_dir(username, projectName)
         if os.path.exists(proj_dir):
