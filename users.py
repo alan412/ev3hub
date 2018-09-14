@@ -130,29 +130,29 @@ class Users(object):
         try:
             # to keep mspradli from spamming people
             forgotTime = self.users[username]['forgot-time']
-            if forgotTime and float(forgotTime) < (time.time() + 300):
+            if forgotTime and (float(forgotTime) < (time.time() + 300):
                 return ''
         except KeyError:
             pass
-        chars = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'
-        forgotID = ''.join(random.SystemRandom().choice(chars)
+        chars='ABCDEFGHJKMNPQRSTUVWXYZ23456789'
+        forgotID=''.join(random.SystemRandom().choice(chars)
                            for _ in range(8))
         try:
-            self.users[username]['forgot'] = pwd_context.hash(forgotID)
-            self.users[username]['forgot-time'] = time.time()
+            self.users[username]['forgot']=pwd_context.hash(forgotID)
+            self.users[username]['forgot-time']=time.time()
             self.save()
         except KeyError:
-            forgotID = ''
+            forgotID=''
         return forgotID
 
     def verify_forgot(self, username, forgot):
         try:
-            forgotTime = self.users[username]['forgot-time']
+            forgotTime=self.users[username]['forgot-time']
             if forgotTime and (float(forgotTime) < (time.time() + (60*60*24))
                                ) and pwd_context.verify(forgot, self.users[username]['forgot']):
                     # Don't save because the next step is changing password
-                self.users[username]['forgot'] = ''
-                forgotTime = ''
+                self.users[username]['forgot']=''
+                forgotTime=''
                 return True
         except KeyError:
             pass
@@ -164,24 +164,24 @@ class Users(object):
 
 # if username already exists, this overwrites it.   So be careful upon calling it!
     def add(self, username, emailAddress, password):
-        self.users[username] = {}
-        self.users[username]['password'] = pwd_context.hash(password)
-        self.users[username]['email'] = emailAddress
+        self.users[username]={}
+        self.users[username]['password']=pwd_context.hash(password)
+        self.users[username]['email']=emailAddress
         self.save()
 
     def change_password(self, username, newpass):
-        self.users[username]['password'] = pwd_context.hash(newpass)
+        self.users[username]['password']=pwd_context.hash(newpass)
         self.save()
 
     def change_email(self, username, emailAddress):
         if emailAddress and (emailAddress != self.users[username]['email']):
-            self.users[username]['email'] = emailAddress
+            self.users[username]['email']=emailAddress
             self.save()
 
     def get(self, username):   # this will return the case version that is in the users list
         if not username:
             return ''  # not found
-        lower_username = username.lower()
+        lower_username=username.lower()
         for key in self.users:
             if key.lower() == lower_username:
                 return key
@@ -189,13 +189,13 @@ class Users(object):
 
     def get_email(self, username):
         try:
-            result = self.users[username]['email']
+            result=self.users[username]['email']
         except KeyError:
-            result = ''
+            result=''
         return result
 
     def verify_password(self, username_in, password):
-        username = self.get(username_in)
+        username=self.get(username_in)
         if username:
             return pwd_context.verify(password, self.users[username]['password'])
         else:
@@ -212,47 +212,47 @@ class Users(object):
             return None
         if not projectName:
             try:
-                projectName = self.get_projectlist(username)[0]['name']
+                projectName=self.get_projectlist(username)[0]['name']
             except (KeyError, IndexError):
                 return None
-        proj_dir = self.get_project_dir(username, projectName)
+        proj_dir=self.get_project_dir(username, projectName)
         if os.path.exists(proj_dir):
             return ev3project.EV3Project(projectName, self.get_project_dir(username, projectName))
         else:
             return None
 
     def new_project(self, username, project, ev3data, who, host):
-        up = UserProjects(username)
+        up=UserProjects(username)
         ev3project.EV3Project.newProject(
             project, self.get_project_dir(username, project), ev3data, who, host)
         up.add_project(project)
 
     def restore_project(self, username, projectName):
-        up = UserProjects(username)
+        up=UserProjects(username)
         if up.project_exists(projectName):
             up.restore_project(projectName)
             return True
         return False
 
     def remove_project(self, username, projectName):
-        up = UserProjects(username)
+        up=UserProjects(username)
         if not up.project_exists(projectName):
             return False
         up.expire_project(projectName)
-        mail = self.get_email(username)
+        mail=self.get_email(username)
         if mail:
-            safe_username = urllib.parse.quote_plus(username)
-            msg = MIMEText("Someone marked project '" + projectName + "' for deletion.\n" +
+            safe_username=urllib.parse.quote_plus(username)
+            msg=MIMEText("Someone marked project '" + projectName + "' for deletion.\n" +
                            "If this wasn't intentional, it can be recovered for " +
                            "the next 7 days from the list of projects.")
 
-            from_email = 'ev3hub@ev3hub.com'
-            msg['To'] = email.utils.formataddr((safe_username, mail))
-            msg['From'] = email.utils.formataddr(('EV3Hub Admin', from_email))
-            msg['Subject'] = 'Project Deleted'
+            from_email='ev3hub@ev3hub.com'
+            msg['To']=email.utils.formataddr((safe_username, mail))
+            msg['From']=email.utils.formataddr(('EV3Hub Admin', from_email))
+            msg['Subject']='Project Deleted'
 
             try:
-                server = smtplib.SMTP('localhost')
+                server=smtplib.SMTP('localhost')
                 server.sendmail(from_email, [mail], msg.as_string())
                 server.quit()
             except IOError:
@@ -261,14 +261,14 @@ class Users(object):
         return True
 
     def get_projectlist(self, username):
-        up = UserProjects(username)
-        projects_dates = up.get_project_list()
+        up=UserProjects(username)
+        projects_dates=up.get_project_list()
 
         return sorted(projects_dates, key=itemgetter('Updated'), reverse=True)
 
     def rename_project(self, username, oldName, newName):
-        path = self.get_project_dir(username, oldName)
-        newPath = self.get_project_dir(username, newName)
+        path=self.get_project_dir(username, oldName)
+        newPath=self.get_project_dir(username, newName)
         # Already a project by this name, don't allow duplicates
         if os.path.exists(newPath):
             return False
@@ -276,47 +276,47 @@ class Users(object):
             return False
         os.rename(path, newPath)
 
-        up = UserProjects(username)
+        up=UserProjects(username)
         up.rename_project(oldName, newName)
         return True
 
     def project_exists(self, username, project):
-        path = self.get_project_dir(username, project)
+        path=self.get_project_dir(username, project)
         if os.path.exists(path):
             return True
         else:
             return False
 
     def mail_token(self, username_in):
-        username = self.get(username_in)
+        username=self.get(username_in)
         if not username:
             return "Login doesn't exist"
         else:
-            mail = self.get_email(username)
+            mail=self.get_email(username)
             if not mail:
                 return "No email defined for user:{0}".format(username)
 
-            token = self.create_forgot_token(username)
+            token=self.create_forgot_token(username)
             if not token:
                 return "Tokens only sent every 5 minutes per user.  Please check your email."
 
-            safe_username = urllib.parse.quote_plus(username)
-            msg = MIMEText("Please go to http://beta.ev3hub.com/forgot?username=" + safe_username +
+            safe_username=urllib.parse.quote_plus(username)
+            msg=MIMEText("Please go to http://beta.ev3hub.com/forgot?username=" + safe_username +
                            "&token=" + token + " to reset your password.  If you" +
                            " did not request that you had forgotten " +
                            "your password, then you can safely ignore this e-mail." +
                            " This expires in 24 hours.\n\nThank you,\nThe EV3HUB team")
 
-            from_email = 'ev3hub@ev3hub.com'
-            msg['To'] = email.utils.formataddr((username, mail))
-            msg['From'] = email.utils.formataddr(('EV3Hub Admin', from_email))
-            msg['Subject'] = 'Forgotten Password'
+            from_email='ev3hub@ev3hub.com'
+            msg['To']=email.utils.formataddr((username, mail))
+            msg['From']=email.utils.formataddr(('EV3Hub Admin', from_email))
+            msg['Subject']='Forgotten Password'
 
 #           print "Simulating sending: {0}, {1},{2}".format(from_email, mail, msg.as_string())
 #           return ''
 
             try:
-                server = smtplib.SMTP('localhost')
+                server=smtplib.SMTP('localhost')
                 server.sendmail(from_email, [mail], msg.as_string())
                 server.quit()
             except IOError:
