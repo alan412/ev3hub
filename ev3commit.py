@@ -95,9 +95,10 @@ class Commit(object):
                         if line.find('.ev3p') != -1:
                             begin = line.find('Target') + 8
                             end = line.find('\\.ev3p')
-                            if testProgram and showTest:
-                                graph.add_edge(
-                                    callee, line[begin:end], style='dotted', weight=1, color='gray')
+                            if testProgram:
+                                if showTest:
+                                    graph.add_edge(
+                                        callee, line[begin:end], style='dotted', weight=1, color='gray')
                             else:
                                 graph.add_edge(
                                     callee, line[begin:end], penwidth=3, weight=10, color='black')
