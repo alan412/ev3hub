@@ -71,7 +71,8 @@ class Commit(object):
         # graph.graph_attr.update(bgcolor='#2e3e56')
 
         graph.graph_attr.update(
-            ranksep='2', ratio='compress', size='10.25,7.75')
+ #           ranksep='2', ratio='compress', size='10.25,7.75')
+            ranksep='2', ratio='compress')
         graph.node_attr.update(fontname='Arial', fontsize='30')
         tests = []
         for filename in self.files():
